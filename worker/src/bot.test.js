@@ -111,3 +111,22 @@ test('full /book flow: date -> slot -> name -> phone -> service creates a bot-so
   assert.equal(dbState.bookings[0].source, 'bot');
   assert.match(sentMessages[sentMessages.length - 1].text, /Запись создана/);
 });
+
+test('an interrupting command clears a mid-flow /book session so later free text is not swallowed', async () => {
+  resetState(); sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: '/start' });
+  sentMessages.length = 0;
+
+  await handleMessage(env, { chat: { id: 111 }, text: '/book' });
+  assert.equal(dbState.sessions.get(111).step, 'await_date');
+
+  await handleMessage(env, { chat: { id: 111 }, text: '/today' });
+  assert.equal(dbState.sessions.has(111), false);
+
+  sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: 'Мария' });
+
+  assert.equal(dbState.bookings.length, 0);
+  assert.equal(dbState.sessions.has(111), false);
+  assert.match(sentMessages[sentMessages.length - 1].text, /умею/);
+});

@@ -66,6 +66,7 @@ async function handleCommand(env, chatId, text) {
     await sendMessage(env, chatId, 'Этот бот приватный.');
     return;
   }
+  await clearSession(env.DB, chatId);
   if (cmd === '/today') {
     await replyBookingsForDate(env, chatId, getTodayMoscow());
   } else if (cmd === '/tomorrow') {
