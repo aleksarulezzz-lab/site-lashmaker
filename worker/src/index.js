@@ -1,6 +1,7 @@
 import { isValidDateFormat, isValidSlotTime, isWorkingDay, FIXED_SLOTS } from './slots.js';
 import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
 import { sendMessage } from './telegram.js';
+import { handleTelegramUpdate } from './bot.js';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -82,6 +83,21 @@ async function handleBook(request, env) {
   return json({ ok: true, id: result.id });
 }
 
+async function handleTelegramWebhook(request, env) {
+  const secret = request.headers.get('X-Telegram-Bot-Api-Secret-Token');
+  if (secret !== env.WEBHOOK_SECRET) {
+    return new Response('forbidden', { status: 403 });
+  }
+  let update;
+  try {
+    update = await request.json();
+  } catch {
+    return new Response('ok');
+  }
+  await handleTelegramUpdate(env, update);
+  return new Response('ok');
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -93,6 +109,9 @@ export default {
     }
     if (url.pathname === '/api/book' && request.method === 'POST') {
       return handleBook(request, env);
+    }
+    if (url.pathname === '/telegram-webhook' && request.method === 'POST') {
+      return handleTelegramWebhook(request, env);
     }
     return json({ error: 'not_found' }, 404);
   }
