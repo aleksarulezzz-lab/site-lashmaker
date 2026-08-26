@@ -1,5 +1,5 @@
 (function(){
-  var WORKER_BASE_URL = 'http://127.0.0.1:8787'; // updated to the real deployed Worker URL in a later task
+  var WORKER_BASE_URL = 'https://lashmaker-booking.alekssandra86.workers.dev';
 
   var FIXED_SLOTS = ['10:00','13:00','16:00'];
   var WEEKDAY_LABELS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
