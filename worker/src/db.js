@@ -37,18 +37,24 @@ export async function createBooking(db, { date, slot_time, client_name, client_p
 }
 
 export async function confirmBookingByToken(db, token, chatId) {
+  const claim = await db.prepare(
+    `UPDATE bookings SET client_chat_id = ?
+     WHERE confirm_token = ? AND status = 'confirmed' AND client_chat_id IS NULL`
+  ).bind(chatId, token).run();
+  if (claim.meta.changes > 0) {
+    const row = await db.prepare(
+      `SELECT date, slot_time FROM bookings WHERE confirm_token = ?`
+    ).bind(token).first();
+    return { ok: true, alreadyConfirmed: false, date: row.date, slot_time: row.slot_time };
+  }
   const row = await db.prepare(
-    `SELECT id, date, slot_time, client_chat_id FROM bookings WHERE confirm_token = ? AND status = 'confirmed'`
+    `SELECT date, slot_time, client_chat_id FROM bookings WHERE confirm_token = ? AND status = 'confirmed'`
   ).bind(token).first();
   if (!row) return { ok: false, reason: 'not_found' };
-  if (row.client_chat_id) {
-    if (row.client_chat_id === chatId) {
-      return { ok: true, alreadyConfirmed: true, date: row.date, slot_time: row.slot_time };
-    }
-    return { ok: false, reason: 'already_claimed' };
+  if (row.client_chat_id === chatId) {
+    return { ok: true, alreadyConfirmed: true, date: row.date, slot_time: row.slot_time };
   }
-  await db.prepare(`UPDATE bookings SET client_chat_id = ? WHERE id = ?`).bind(chatId, row.id).run();
-  return { ok: true, alreadyConfirmed: false, date: row.date, slot_time: row.slot_time };
+  return { ok: false, reason: 'already_claimed' };
 }
 
 export async function getPendingReminderCandidates(db, dateStrings) {
