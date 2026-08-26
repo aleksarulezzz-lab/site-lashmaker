@@ -2,6 +2,7 @@ import { isValidDateFormat, isValidSlotTime, isWorkingDay, getTodayMoscow, FIXED
 import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
+import { runReminderSweep } from './reminders.js';
 
 const ALLOWED_ORIGINS = ['https://aleksarulezzz-lab.github.io'];
 
@@ -92,7 +93,8 @@ async function handleBook(request, env, cors) {
     await sendMessage(env, adminChatId,
       `🆕 Новая запись с сайта:\n${escapeHtml(client_name)}, ${escapeHtml(client_phone)}\n${escapeHtml(service)}\n${date} ${slot_time}`);
   }
-  return json({ ok: true, id: result.id }, 200, cors);
+  const confirmUrl = env.BOT_USERNAME ? `https://t.me/${env.BOT_USERNAME}?start=confirm_${result.confirmToken}` : null;
+  return json({ ok: true, id: result.id, confirmUrl }, 200, cors);
 }
 
 async function checkRateLimit(env, ip) {
@@ -136,5 +138,9 @@ export default {
       return handleTelegramWebhook(request, env);
     }
     return json({ error: 'not_found' }, 404, cors);
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runReminderSweep(env));
   }
 };

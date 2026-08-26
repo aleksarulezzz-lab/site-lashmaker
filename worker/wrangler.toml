@@ -10,3 +10,13 @@ database_id = "ab4289b3-b8af-4752-8b99-cfefd1645758"
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
 id = "a2f41f7531dd45788fcfc0ecb8e8f508"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+# Set once the Telegram bot exists -- its public @username, used to build
+# the client-facing confirmation deep link (t.me/<username>?start=confirm_<token>).
+# Booking still works with this unset; the confirm link/reminder feature is
+# simply inactive (confirmUrl comes back null) until it's filled in.
+BOT_USERNAME = ""
