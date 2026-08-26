@@ -3,6 +3,10 @@ import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
 import { runReminderSweep } from './reminders.js';
+import { hashVisitor, recordPageView } from './analytics.js';
+import { sendEveningStats } from './dailyStats.js';
+
+const EVENING_STATS_CRON = '0 17 * * *';
 
 const ALLOWED_ORIGINS = ['https://aleksarulezzz-lab.github.io'];
 
@@ -53,7 +57,7 @@ async function handleAvailability(request, env, cors) {
 
 async function handleBook(request, env, cors) {
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  if (env.RATE_LIMIT && !(await checkRateLimit(env, ip))) {
+  if (env.RATE_LIMIT && !(await checkRateLimit(env, `book:${ip}`, 5))) {
     return json({ error: 'rate_limited' }, 429, cors);
   }
   let body;
@@ -97,13 +101,31 @@ async function handleBook(request, env, cors) {
   return json({ ok: true, id: result.id, confirmUrl }, 200, cors);
 }
 
-async function checkRateLimit(env, ip) {
-  const key = `book:${ip}`;
+async function checkRateLimit(env, key, limit) {
   const current = await env.RATE_LIMIT.get(key);
   const count = current ? parseInt(current, 10) : 0;
-  if (count >= 5) return false;
+  if (count >= limit) return false;
   await env.RATE_LIMIT.put(key, String(count + 1), { expirationTtl: 600 });
   return true;
+}
+
+async function handleTrack(request, env, cors) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (env.RATE_LIMIT && !(await checkRateLimit(env, `track:${ip}`, 30))) {
+    return new Response(null, { status: 204, headers: cors });
+  }
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(null, { status: 204, headers: cors });
+  }
+  const path = typeof body?.path === 'string' && body.path ? body.path.slice(0, 200) : '/';
+  const ua = request.headers.get('User-Agent') || 'unknown';
+  const date = getTodayMoscow();
+  const visitorHash = await hashVisitor(ip, ua, date);
+  await recordPageView(env.DB, { date, path, visitorHash });
+  return new Response(null, { status: 204, headers: cors });
 }
 
 async function handleTelegramWebhook(request, env) {
@@ -134,6 +156,9 @@ export default {
     if (url.pathname === '/api/book' && request.method === 'POST') {
       return handleBook(request, env, cors);
     }
+    if (url.pathname === '/api/track' && request.method === 'POST') {
+      return handleTrack(request, env, cors);
+    }
     if (url.pathname === '/telegram-webhook' && request.method === 'POST') {
       return handleTelegramWebhook(request, env);
     }
@@ -141,6 +166,10 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runReminderSweep(env));
+    if (event.cron === EVENING_STATS_CRON) {
+      ctx.waitUntil(sendEveningStats(env));
+    } else {
+      ctx.waitUntil(runReminderSweep(env));
+    }
   }
 };

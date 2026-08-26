@@ -12,7 +12,9 @@ binding = "RATE_LIMIT"
 id = "a2f41f7531dd45788fcfc0ecb8e8f508"
 
 [triggers]
-crons = ["*/5 * * * *"]
+# */5 * * * * -- reminder sweep, every 5 minutes.
+# 0 17 * * *  -- evening site-stats summary, 20:00 Moscow (UTC+3, fixed).
+crons = ["*/5 * * * *", "0 17 * * *"]
 
 [vars]
 # Set once the Telegram bot exists -- its public @username, used to build
