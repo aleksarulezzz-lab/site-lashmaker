@@ -50,6 +50,7 @@
   var form = document.getElementById('bookingForm');
   var submitBtn = document.getElementById('bookingSubmitBtn');
   var msgEl = document.getElementById('formMsg');
+  var confirmLinkEl = document.getElementById('bookingConfirmLink');
 
   function setSubmitEnabled(){
     submitBtn.disabled = !(state.selectedDate && state.selectedTime);
@@ -146,6 +147,7 @@
     if(!service){ msgEl.textContent = 'Выберите услугу.'; msgEl.className = 'form-msg is-error'; return; }
     if(!state.selectedDate || !state.selectedTime){ msgEl.textContent = 'Выберите дату и время записи.'; msgEl.className = 'form-msg is-error'; return; }
     submitBtn.disabled = true;
+    confirmLinkEl.hidden = true;
     fetch(WORKER_BASE_URL + '/api/book', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -160,9 +162,13 @@
       if(res.status === 409){ throw new Error('slot_taken'); }
       if(!res.ok){ throw new Error('failed'); }
       return res.json();
-    }).then(function(){
+    }).then(function(data){
       msgEl.textContent = 'Спасибо, ' + name + '! Заявка отправлена — я свяжусь с вами для подтверждения записи.';
       msgEl.className = 'form-msg is-success';
+      if(data && data.confirmUrl){
+        confirmLinkEl.href = data.confirmUrl;
+        confirmLinkEl.hidden = false;
+      }
       form.reset();
       state.selectedDate = null;
       state.selectedTime = null;
