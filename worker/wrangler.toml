@@ -19,4 +19,4 @@ crons = ["*/5 * * * *"]
 # the client-facing confirmation deep link (t.me/<username>?start=confirm_<token>).
 # Booking still works with this unset; the confirm link/reminder feature is
 # simply inactive (confirmUrl comes back null) until it's filled in.
-BOT_USERNAME = ""
+BOT_USERNAME = "Your_lash_maker_bot"
