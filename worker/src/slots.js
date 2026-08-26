@@ -52,3 +52,12 @@ export function formatDateLabel(dateStr) {
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
   return `${label} ${day}.${month}`;
 }
+
+export function appointmentInstantUtcMs(dateStr, slotTime) {
+  return Date.parse(`${dateStr}T${slotTime}:00Z`) - MOSCOW_OFFSET_MS;
+}
+
+export function isDueForReminder(booking, nowMs, leadMs, windowMs) {
+  const dueAt = appointmentInstantUtcMs(booking.date, booking.slot_time) - leadMs;
+  return nowMs >= dueAt && nowMs < dueAt + windowMs;
+}

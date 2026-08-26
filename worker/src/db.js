@@ -14,19 +14,56 @@ export async function getBookedSlotsInRange(db, fromStr, toStr) {
   return new Set(results.map(r => `${r.date}|${r.slot_time}`));
 }
 
+function generateConfirmToken() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export async function createBooking(db, { date, slot_time, client_name, client_phone, service, source }) {
+  const confirmToken = generateConfirmToken();
   try {
     const result = await db.prepare(
-      `INSERT INTO bookings (date, slot_time, client_name, client_phone, service, status, source)
-       VALUES (?, ?, ?, ?, ?, 'confirmed', ?)`
-    ).bind(date, slot_time, client_name, client_phone, service, source).run();
-    return { ok: true, id: result.meta.last_row_id };
+      `INSERT INTO bookings (date, slot_time, client_name, client_phone, service, status, source, confirm_token)
+       VALUES (?, ?, ?, ?, ?, 'confirmed', ?, ?)`
+    ).bind(date, slot_time, client_name, client_phone, service, source, confirmToken).run();
+    return { ok: true, id: result.meta.last_row_id, confirmToken };
   } catch (e) {
     if (String(e.message).includes('UNIQUE')) {
       return { ok: false, reason: 'slot_taken' };
     }
     throw e;
   }
+}
+
+export async function confirmBookingByToken(db, token, chatId) {
+  const row = await db.prepare(
+    `SELECT id, date, slot_time, client_chat_id FROM bookings WHERE confirm_token = ? AND status = 'confirmed'`
+  ).bind(token).first();
+  if (!row) return { ok: false, reason: 'not_found' };
+  if (row.client_chat_id) {
+    if (row.client_chat_id === chatId) {
+      return { ok: true, alreadyConfirmed: true, date: row.date, slot_time: row.slot_time };
+    }
+    return { ok: false, reason: 'already_claimed' };
+  }
+  await db.prepare(`UPDATE bookings SET client_chat_id = ? WHERE id = ?`).bind(chatId, row.id).run();
+  return { ok: true, alreadyConfirmed: false, date: row.date, slot_time: row.slot_time };
+}
+
+export async function getPendingReminderCandidates(db, dateStrings) {
+  const placeholders = dateStrings.map(() => '?').join(',');
+  const { results } = await db.prepare(
+    `SELECT id, date, slot_time, client_name, client_phone, service, client_chat_id
+     FROM bookings
+     WHERE status = 'confirmed' AND client_chat_id IS NOT NULL AND reminder_sent = 0
+       AND date IN (${placeholders})`
+  ).bind(...dateStrings).all();
+  return results;
+}
+
+export async function markReminderSent(db, id) {
+  await db.prepare(`UPDATE bookings SET reminder_sent = 1 WHERE id = ?`).bind(id).run();
 }
 
 export async function getAdminChatId(db) {

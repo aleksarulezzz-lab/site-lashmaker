@@ -7,12 +7,19 @@ CREATE TABLE IF NOT EXISTS bookings (
   service TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'confirmed',
   source TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  confirm_token TEXT,
+  client_chat_id INTEGER,
+  reminder_sent INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_slot_confirmed
   ON bookings(date, slot_time)
   WHERE status = 'confirmed';
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_confirm_token
+  ON bookings(confirm_token)
+  WHERE confirm_token IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS config (
   key TEXT PRIMARY KEY,
