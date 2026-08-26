@@ -1,6 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSendMessagePayload, buildAnswerCallbackPayload, inlineKeyboard } from './telegram.js';
+import { buildSendMessagePayload, buildAnswerCallbackPayload, inlineKeyboard, escapeHtml } from './telegram.js';
+
+test('escapeHtml neutralizes tag-forming characters so user input cannot inject Telegram HTML markup', () => {
+  assert.equal(escapeHtml('<a href="evil">click</a>'), '&lt;a href="evil"&gt;click&lt;/a&gt;');
+});
+
+test('escapeHtml escapes bare ampersands', () => {
+  assert.equal(escapeHtml('Tom & Jerry'), 'Tom &amp; Jerry');
+});
 
 test('buildSendMessagePayload includes chat_id, text and HTML parse mode', () => {
   const payload = buildSendMessagePayload(123, 'hello');

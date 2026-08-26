@@ -1,3 +1,10 @@
+export function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export function buildSendMessagePayload(chatId, text, replyMarkup) {
   const payload = { chat_id: chatId, text, parse_mode: 'HTML' };
   if (replyMarkup) payload.reply_markup = replyMarkup;
