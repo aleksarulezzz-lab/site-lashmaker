@@ -11,7 +11,7 @@ function resetState() {
 const sentMessages = [];
 
 mock.module('./db.js', {
-  namedExports: {
+  exports: {
     getBookingsForDate: async (db, date) =>
       dbState.bookings.filter(b => b.date === date && b.status === 'confirmed'),
     getBookedSlotsInRange: async (db, from, to) => new Set(
@@ -40,10 +40,11 @@ mock.module('./db.js', {
 });
 
 mock.module('./telegram.js', {
-  namedExports: {
+  exports: {
     sendMessage: async (env, chatId, text, replyMarkup) => { sentMessages.push({ chatId, text, replyMarkup }); },
     answerCallbackQuery: async () => {},
-    inlineKeyboard: (rows) => ({ inline_keyboard: rows })
+    inlineKeyboard: (rows) => ({ inline_keyboard: rows }),
+    escapeHtml: (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   }
 });
 
@@ -110,6 +111,20 @@ test('full /book flow: date -> slot -> name -> phone -> service creates a bot-so
   assert.equal(dbState.bookings[0].client_name, 'Мария');
   assert.equal(dbState.bookings[0].source, 'bot');
   assert.match(sentMessages[sentMessages.length - 1].text, /Запись создана/);
+});
+
+test('/today escapes HTML in a client name so it cannot inject markup into the Telegram message', async () => {
+  resetState(); sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: '/start' });
+  dbState.bookings.push({
+    date: '2026-08-31', slot_time: '10:00',
+    client_name: '<a href="evil">click</a>', client_phone: '+79990000000',
+    service: 'Классика', status: 'confirmed'
+  });
+  sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: '/date 2026-08-31' });
+  assert.match(sentMessages[0].text, /&lt;a href="evil"&gt;click&lt;\/a&gt;/);
+  assert.doesNotMatch(sentMessages[0].text, /<a href="evil">/);
 });
 
 test('an interrupting command clears a mid-flow /book session so later free text is not swallowed', async () => {

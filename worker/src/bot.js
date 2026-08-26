@@ -6,7 +6,7 @@ import {
   getBookingsForDate, getBookedSlotsInRange, createBooking,
   getAdminChatId, claimAdminChatId, getSession, setSession, clearSession
 } from './db.js';
-import { sendMessage, answerCallbackQuery, inlineKeyboard } from './telegram.js';
+import { sendMessage, answerCallbackQuery, inlineKeyboard, escapeHtml } from './telegram.js';
 
 const HELP_TEXT = [
   'Я бот записи Александры. Вот что я умею:',
@@ -19,7 +19,7 @@ const HELP_TEXT = [
 const PHONE_RE = /^[\d\s\+\-\(\)]{10,18}$/;
 
 function formatBookingLine(b) {
-  return `• ${b.slot_time} — ${b.client_name}, ${b.client_phone} (${b.service})`;
+  return `• ${b.slot_time} — ${escapeHtml(b.client_name)}, ${escapeHtml(b.client_phone)} (${escapeHtml(b.service)})`;
 }
 
 async function replyBookingsForDate(env, chatId, dateStr) {
@@ -113,7 +113,7 @@ async function handleSessionText(env, chatId, session, text) {
       return;
     }
     await sendMessage(env, chatId,
-      `✅ Запись создана: ${draft.client_name}, ${draft.client_phone}, ${draft.service} — ${formatDateLabel(draft.date)} ${draft.slot_time}`);
+      `✅ Запись создана: ${escapeHtml(draft.client_name)}, ${escapeHtml(draft.client_phone)}, ${escapeHtml(draft.service)} — ${formatDateLabel(draft.date)} ${draft.slot_time}`);
   }
 }
 
