@@ -102,6 +102,11 @@ async function handleSessionText(env, chatId, session, text) {
   if (session.step === 'await_service') {
     if (!value) { await sendMessage(env, chatId, 'Услуга не может быть пустой, введите ещё раз:'); return; }
     const draft = { ...session.draft, service: value };
+    if (draft.date < getTodayMoscow()) {
+      await clearSession(env.DB, chatId);
+      await sendMessage(env, chatId, 'Эта дата уже прошла (кнопка была из старого сообщения). Начните заново: /book');
+      return;
+    }
     const result = await createBooking(env.DB, {
       date: draft.date, slot_time: draft.slot_time,
       client_name: draft.client_name, client_phone: draft.client_phone,
