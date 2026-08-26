@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хронология дизайна — сайт Александры Рулевой</title>
+<style>
+  :root{
+    --bg:#0d0c10; --surface:#151319; --ink:#f0ece6; --ink-soft:#948d9e; --border:#2a2732; --accent:#c9a24a;
+  }
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:60px 24px 100px;}
+  .wrap{max-width:1080px;margin:0 auto;}
+  h1{font-size:30px;margin-bottom:6px;}
+  p.lead{color:var(--ink-soft);margin-bottom:8px;max-width:680px;line-height:1.6;}
+  .round{margin-top:56px;}
+  .round-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;flex-wrap:wrap;}
+  .round-head h2{font-size:19px;margin:0;color:var(--ink);}
+  .round-head span.date{font-size:12.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;}
+  .round-note{color:var(--ink-soft);font-size:14px;margin:0 0 26px;max-width:680px;line-height:1.6;}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  a.card{
+    display:block;text-decoration:none;color:inherit;border-radius:14px;padding:24px 22px;
+    border:1px solid var(--border);background:var(--surface);transition:.2s;position:relative;overflow:hidden;
+  }
+  a.card:hover{transform:translateY(-4px);box-shadow:0 24px 50px -24px rgba(0,0,0,.6);border-color:var(--accent);}
+  .card h3{font-size:16.5px;margin:0 0 8px;}
+  .card p{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.5;}
+  .swatch{display:flex;gap:6px;margin-bottom:16px;}
+  .swatch span{width:22px;height:22px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.15);}
+  .tag{position:absolute;top:16px;right:16px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:100px;background:rgba(201,162,74,.15);color:var(--accent);}
+
+  /* round 1 swatches */
+  .r1c1 .sw1{background:#dd9a95;} .r1c1 .sw2{background:#b7c4a4;} .r1c1 .sw3{background:#fff;}
+  .r1c2 .sw1{background:#cda45b;} .r1c2 .sw2{background:#0b0a09;} .r1c2 .sw3{background:#e6c078;}
+  .r1c3 .sw1{background:#ff3d8a;} .r1c3 .sw2{background:#7c3aed;} .r1c3 .sw3{background:#ffb020;}
+  /* round 2 swatches */
+  .r2c1 .sw1{background:#cda45b;} .r2c1 .sw2{background:#0a0908;} .r2c1 .sw3{background:#e6c078;}
+  .r2c2 .sw1{background:#c9a24a;} .r2c2 .sw2{background:#0c0806;} .r2c2 .sw3{background:#5a1f22;}
+  .r2c3 .sw1{background:#d9a441;} .r2c3 .sw2{background:#a32334;} .r2c3 .sw3{background:#0a0807;}
+  .r2c4 .sw1{background:#c22138;} .r2c4 .sw2{background:#c9a24a;} .r2c4 .sw3{background:#0a0607;}
+  .r2c5 .sw1{background:#2f6fc4;} .r2c5 .sw2{background:#c1592f;} .r2c5 .sw3{background:#080a0d;}
+  .r2c6 .sw1{background:#c7a06a;} .r2c6 .sw2{background:#6b1f28;} .r2c6 .sw3{background:#060606;}
+  /* round 3 swatches (same palettes, deeper graphics pass) */
+  .r3c1 .sw1{background:#c9a24a;} .r3c1 .sw2{background:#0c0806;} .r3c1 .sw3{background:#5a1f22;}
+  .r3c2 .sw1{background:#d9a441;} .r3c2 .sw2{background:#a32334;} .r3c2 .sw3{background:#0a0807;}
+  .r3c3 .sw1{background:#c22138;} .r3c3 .sw2{background:#c9a24a;} .r3c3 .sw3{background:#0a0607;}
+  .r3c4 .sw1{background:#2f6fc4;} .r3c4 .sw2{background:#c1592f;} .r3c4 .sw3{background:#080a0d;}
+  .r3c5 .sw1{background:#c7a06a;} .r3c5 .sw2{background:#6b1f28;} .r3c5 .sw3{background:#060606;}
+  .tag-wow{background:rgba(230,60,90,.16);color:#ff8fa3;}
+  /* round 4 swatches (Sicilian Baroque deep dives) */
+  .r4c1 .sw1{background:#c9a24a;} .r4c1 .sw2{background:#0c0806;} .r4c1 .sw3{background:#e8c876;}
+  .r4c2 .sw1{background:#e8c876;} .r4c2 .sw2{background:#0c0806;} .r4c2 .sw3{background:#7a5a24;}
+  .r4c3 .sw1{background:#7a5a24;} .r4c3 .sw2{background:#150f0a;} .r4c3 .sw3{background:#c9a24a;}
+  .r4c4 .sw1{background:#5a7a3f;} .r4c4 .sw2{background:#c9a24a;} .r4c4 .sw3{background:#0c0806;}
+  .r4c5 .sw1{background:#e8c876;} .r4c5 .sw2{background:#1c140a;} .r4c5 .sw3{background:#0c0806;}
+  .r4c6 .sw1{background:#e86c4a;} .r4c6 .sw2{background:#c9a24a;} .r4c6 .sw3{background:#0c0806;}
+  .r4c7 .sw1{background:#e8c876;} .r4c7 .sw2{background:#f4e9d6;} .r4c7 .sw3{background:#0c0806;}
+  .r4c8 .sw1{background:#9b6fd6;} .r4c8 .sw2{background:#c9a24a;} .r4c8 .sw3{background:#150c1e;}
+  .tag-photo{background:rgba(232,200,118,.18);color:#f4e9d6;}
+  /* round 6 swatches (light theme) */
+  .r6c1 .sw1{background:#8f76c9;} .r6c1 .sw2{background:#c8dced;} .r6c1 .sw3{background:#faf7fd;}
+  .r6c2 .sw1{background:#d97a34;} .r6c2 .sw2{background:#2f7a8c;} .r6c2 .sw3{background:#fff9ef;}
+
+  @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:600px){.cards{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Сайт-визитка Александры Рулевой — хронология дизайна</h1>
+  <p class="lead">Здесь собраны все прототипы по мере их создания — от первых трёх концепций до пяти вариаций в стиле Dolce&nbsp;&amp;&nbsp;Gabbana и дальнейшего углубления в приоритетное направление Sicilian Baroque.</p>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 1 — первые концепции</h2>
+      <span class="date">создано первым</span>
+    </div>
+    <p class="round-note">Три исходных направления: нежное, люксовое и яркое. Контент был обезличенным (студия), без привязки к имени мастера.</p>
+    <div class="cards">
+      <a class="card r1c1" href="variant-1-nezhny.html">
+        <span class="tag">v1</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Нежный / женственный</h3>
+        <p>Пастельные розово-салатовые тона, минимализм, Cormorant Garamond.</p>
+      </a>
+      <a class="card r1c2" href="variant-2-lux.html">
+        <span class="tag">v1</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Люкс / премиум (исходный)</h3>
+        <p>Чёрный с золотом, строгая сетка. Плоский, без теней и анимаций — стартовая версия.</p>
+      </a>
+      <a class="card r1c3" href="variant-3-yarky.html">
+        <span class="tag">v1</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Яркий / трендовый</h3>
+        <p>Градиент фуксия–фиолетовый–оранжевый, жирные скругления, Unbounded.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 2 — тёмная тема: доработка + Dolce&nbsp;&amp;&nbsp;Gabbana</h2>
+      <span class="date">создано вторым</span>
+    </div>
+    <p class="round-note">Весь контент переведён на личный бренд Александры Рулевой (первое лицо, без «мы/студия»). Первая карточка — доработка исходной тёмной версии: добавлены глубина, слоистые тени, свечение и скролл-анимации. Остальные пять — новые вариации тёмной темы с аллюзиями на эстетику Dolce&nbsp;&amp;&nbsp;Gabbana и образ Моники Беллуччи.</p>
+    <div class="cards">
+      <a class="card r2c1" href="variant-2b-lux-glow.html">
+        <span class="tag">доработка</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Lux Glow</h3>
+        <p>Обновлённый люкс: глубина, свечение, парение карточки, скролл-реveal, мерцающий заголовок.</p>
+      </a>
+      <a class="card r2c2" href="variant-4-sicilian-baroque.html">
+        <span class="tag">новое</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Sicilian Baroque</h3>
+        <p>Античное золото, дамасковый узор, орнаментальные рамки, барочная драма.</p>
+      </a>
+      <a class="card r2c3" href="variant-5-leopard-noir.html">
+        <span class="tag">новое</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Leopard Noir</h3>
+        <p>Леопардовый принт, чёрное золото с алым акцентом, дикая грация.</p>
+      </a>
+      <a class="card r2c4" href="variant-6-scarlatto.html">
+        <span class="tag">новое</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Scarlatto Passionale</h3>
+        <p>Чёрный, алый и золото, корсетные линии, страстная драматургия.</p>
+      </a>
+      <a class="card r2c5" href="variant-7-majolica.html">
+        <span class="tag">новое</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Maiolica Mediterranea</h3>
+        <p>Кобальт, терракота и золото, керамические медальоны, средиземноморский дух.</p>
+      </a>
+      <a class="card r2c6" href="variant-8-cinema-glam.html">
+        <span class="tag">новое</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Cinema Noir Glam</h3>
+        <p>Киношная виньетка, зерно плёнки, леттербокс, бронза и шампань крупным планом.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 3 — графический апгрейд (v2)</h2>
+      <span class="date">создано третьим</span>
+    </div>
+    <p class="round-note">Те же пять вариаций, доведённые до максимума: вместо CSS-заглушек — вручную нарисованная SVG-графика под каждую тему (барочный орнамент, леопардовая розетка, корсетная шнуровка, майоликовый медальон, киноплёнка), плюс настоящее движение — 3D-наклон карточек за курсором, параллакс, магнитная кнопка, скролл-анимации прорисовки линий, курсор-прожектор. Каждый файл проверен вживую в браузере: клики по вкладкам изгибов, тогглы «до/после», фильтры портфолио — всё кликабельно и работает. Оригиналы раунда 2 не изменены, лежат выше.</p>
+    <div class="cards">
+      <a class="card r3c1" href="variant-4-sicilian-baroque-v2.html">
+        <span class="tag tag-wow">v2 · вау</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Sicilian Baroque v2</h3>
+        <p>Рисованный акантовый орнамент вместо текстовых значков, золотая фольга на заголовке, scroll-прорисовка узорных разделителей, 3D-наклон карточек, бегущая строка, буквица.</p>
+      </a>
+      <a class="card r3c2" href="variant-5-leopard-noir-v2.html">
+        <span class="tag tag-wow">v2 · вау</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Leopard Noir v2</h3>
+        <p>Настоящая леопардовая розетка (SVG-паттерн, не точки), параллакс на герое, магнитная CTA-кнопка, атласный блик на картах при наведении.</p>
+      </a>
+      <a class="card r3c3" href="variant-6-scarlatto-v2.html">
+        <span class="tag tag-wow">v2 · вау</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Scarlatto Passionale v2</h3>
+        <p>Бархатный занавес открывается при загрузке страницы, корсетная шнуровка вокруг hero-карточки, шёлковый переливающийся фон, пульс на кнопке записи.</p>
+      </a>
+      <a class="card r3c4" href="variant-7-majolica-v2.html">
+        <span class="tag tag-wow">v2 · вау</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Maiolica Mediterranea v2</h3>
+        <p>Нарисованный керамический медальон медленно вращается за hero-карточкой, волнистая кайма как край майоликовой плитки, тёплый блик солнца.</p>
+      </a>
+      <a class="card r3c5" href="variant-8-cinema-glam-v2.html">
+        <span class="tag tag-wow">v2 · вау</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Cinema Noir Glam v2</h3>
+        <p>Плёночная перфорация по краю кадра, тёплая световая засветка, курсор-прожектор над hero, хроматическая аберрация на фото при наведении.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 4 — Sicilian Baroque: углубление в направление</h2>
+      <span class="date">создано четвёртым</span>
+    </div>
+    <p class="round-note">Sicilian Baroque выделилась как приоритетное направление. Сначала — доработка исходной v2-версии. Затем вы прислали 7 референсов премиальных lookbook-сайтов и попросили вариант под каждый: по плану должно было запуститься 7 параллельных форков поверх v3-базы, но сессия оборвалась из-за ошибки соединения с API прямо во время их запуска — до диска успели дойти только 2 (Imperial и Noir Minimal), а сама хронология так и осталась не обновлена. Остальные 5 референсов я нашла в сохранённой истории чата и на их основе достроила недостающие варианты в этой сессии — теперь здесь все 7 плюс доработка v3.</p>
+    <div class="cards">
+      <a class="card r4c1" href="variant-4-sicilian-baroque-v3.html">
+        <span class="tag">доработка v2</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Sicilian Baroque v3</h3>
+        <p>Бархатный занавес раздвигается при загрузке страницы, шёлковый блик пробегает по кнопкам при наведении.</p>
+      </a>
+      <a class="card r4c2" href="variant-9-baroque-imperial.html">
+        <span class="tag tag-wow">референс · воин</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Imperial</h3>
+        <p>Фото Александры в арочной раме с золотыми «пластинами доспехов» по бокам, плавающий хедер-пилюля со стеклом, кикер-теги над заголовком.</p>
+      </a>
+      <a class="card r4c3" href="variant-10-baroque-noir-minimal.html">
+        <span class="tag">референс · VisualStudio</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Noir Minimal</h3>
+        <p>Крайняя сдержанность: только курсивный воремарк и портрет Александры, проступающий из полной черноты с золотым контровым светом — ни одной лишней детали.</p>
+      </a>
+      <a class="card r4c4" href="variant-11-baroque-botanical.html">
+        <span class="tag tag-wow">референс · цветочный трамвай</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Botanical</h3>
+        <p>Фото Александры в органичной рамке, золочёные акантовые лозы и цветы прорастают поверх её краёв с обеих сторон hero.</p>
+      </a>
+      <a class="card r4c5" href="variant-12-baroque-silk-drape.html">
+        <span class="tag tag-wow">любимый вариант</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Silk Drape</h3>
+        <p>Во весь экран — драпированный шёлк, огромное курсивное имя и овальный медальон с портретом Александры сбоку. Единственный вариант, который решили не переделывать — только добавили фото.</p>
+      </a>
+      <a class="card r4c6" href="variant-13-baroque-aurora.html">
+        <span class="tag tag-wow">референс · закат Logoipsum</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Aurora</h3>
+        <p>Фото Александры растворяется в тёплом сицилийском зареве золота и терракоты у основания hero, пилюля-бейдж с рейтингом над заголовком.</p>
+      </a>
+      <a class="card r4c7" href="variant-14-baroque-celestial.html">
+        <span class="tag tag-wow">референс · облачные карточки</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Celestial</h3>
+        <p>Портрет Александры без единой жёсткой границы, тающий в тёплой золотой дымке облаков, карточки-подсказки выглядывают с краёв рядом с ней.</p>
+      </a>
+      <a class="card r4c8" href="variant-15-baroque-portal.html">
+        <span class="tag tag-wow">✦ сказочный флагман</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Portal</h3>
+        <p>Золочёная арка с самоцветами, атмосфера и парящие искры — три независимых слоя расходятся при движении курсора, и фокус сходится на фото Александры в проёме портала.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 5 — реальное фото и доработка по правкам</h2>
+      <span class="date">создано пятым</span>
+    </div>
+    <p class="round-note">Вы отметили, что 7 вариантов раунда 4 выглядели слишком однотипно, попросили встроить настоящее фото Александры как фокус внимания и сделать один вариант по-настоящему сказочным — с расходящимися планами на hero-экране. В работу взяли 5 фото Александры: каждый из вариантов ниже пересобран под конкретное фото и стал заметно отличаться от соседей — не только палитрой, но и самой композицией. Это те же файлы, что и в Раунде 4 (обновлены на месте, не копии) — карточки здесь просто ещё раз собирают их в одном месте с пометкой, какое фото где.</p>
+    <div class="cards">
+      <a class="card r4c2" href="variant-9-baroque-imperial.html">
+        <span class="tag tag-photo">фото · чёрное платье</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Imperial</h3>
+        <p>Портрет в арочной нише с золотыми «пластинами доспехов» по бокам — прямой уверенный взгляд.</p>
+      </a>
+      <a class="card r4c3" href="variant-10-baroque-noir-minimal.html">
+        <span class="tag tag-photo">фото · в саду</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Noir Minimal</h3>
+        <p>Портрет проступает из полной черноты с золотым контровым светом — фон сада исчезает почти без следа.</p>
+      </a>
+      <a class="card r4c4" href="variant-11-baroque-botanical.html">
+        <span class="tag tag-photo">фото · в саду</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Botanical</h3>
+        <p>То же садовое фото, но открыто — золотые лозы прорастают поверх краёв органичной рамки.</p>
+      </a>
+      <a class="card r4c5" href="variant-12-baroque-silk-drape.html">
+        <span class="tag tag-photo">фото · с розами</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Silk Drape</h3>
+        <p>Единственный вариант без переделки — только добавлен овальный медальон с портретом сбоку от имени.</p>
+      </a>
+      <a class="card r4c6" href="variant-13-baroque-aurora.html">
+        <span class="tag tag-photo">фото · в парке</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Aurora</h3>
+        <p>Портрет из парка на закате растворяется в тёплом золотисто-терракотовом зареве у подножия hero.</p>
+      </a>
+      <a class="card r4c7" href="variant-14-baroque-celestial.html">
+        <span class="tag tag-photo">фото · с розами</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Celestial</h3>
+        <p>То же фото с розами, но растворено без единой жёсткой границы в тёплой золотой дымке облаков.</p>
+      </a>
+      <a class="card r4c8" href="variant-15-baroque-portal.html">
+        <span class="tag tag-wow">✦ фото · джинсовая куртка</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Baroque Portal</h3>
+        <p>Сказочный флагман: три слоя портала расходятся при движении курсора, фокус сходится на фото в проёме арки.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 6 — светлая тема: Lilac Sky и «Летнее сияние»</h2>
+      <span class="date">вторая волна правок: рама, кроп фото, бегущая строка, облака</span>
+    </div>
+    <p class="round-note">Первый заход на «сказочную облачную» версию (тёмное небо со звёздами, вырезанное фото с искажением края при наведении) не понравился совсем. Сделала два светлых варианта с нуля: лиловый-голубой и насыщенный летний. Первая правка убрала Сицилию/Италию из текстов, поправила фото и заменила плоскую решётку из бусин на слоистую резную раму — но эта резная рама тоже не подошла («порнография», тяжело и аляповато). Вторая правка: рама переделана в тонкие двойные золотые линии без тяжёлой лепнины и медальонов; заменила хрупкую 8-слойную CSS-маску фото (не рендерилась в Safari — вылезал жёсткий прямоугольный край) на одну надёжную маску + декоративные облака по нижним углам, чтобы обыграть переход; бегущая строка теперь достаточно длинная, чтобы не было паузы-пробела при зацикливании; облака стали пушистыми зефирными с розово-голубым градиентом вместо однотонных шариков; на летнем сайте поправила контраст цифр в статистике и увела фоновое облако от заголовка.</p>
+    <div class="cards">
+      <a class="card r6c1" href="variant-17-lilac-sky.html">
+        <span class="tag tag-wow">✦ новое направление</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Lilac Sky</h3>
+        <p>Воздушная светлая тема: лилово-голубое небо с зефирными облаками, портрет с розами (цветы и тортик скрыты облаком), тонкая золотая рама-линия.</p>
+      </a>
+      <a class="card r6c2" href="variant-18-sicilian-sun.html">
+        <span class="tag tag-wow">✦ новое направление</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Летнее сияние</h3>
+        <p>Насыщенное летнее солнце: цитрусово-терракотовое небо, глубокий бирюзовый акцент, портрет в чёрном платье, солнечные блики, тонкая золотая рама-линия.</p>
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

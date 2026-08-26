@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Просмотр сайта — десктоп / мобильный</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:#1c1c22;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden;}
+  .toolbar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:12px 18px;background:#26262f;border-bottom:1px solid #38384a;
+  }
+  .toolbar label{font-size:12px;color:#9a9ab0;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+  .toolbar select{
+    padding:8px 12px;border-radius:8px;border:1px solid #46465a;background:#1c1c22;color:#f0f0f5;
+    font-size:14px;min-width:260px;
+  }
+  .device-btns{display:flex;gap:6px;background:#1c1c22;border:1px solid #46465a;border-radius:10px;padding:4px;}
+  .device-btns button{
+    border:none;background:transparent;color:#9a9ab0;padding:8px 14px;border-radius:7px;font-size:13px;
+    font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .device-btns button.is-active{background:#6a5acd;color:#fff;}
+  .device-btns button:hover:not(.is-active){color:#f0f0f5;}
+  .toolbar .spacer{flex:1;}
+  .icon-btn{
+    border:1px solid #46465a;background:#1c1c22;color:#c7c7d8;padding:8px 12px;border-radius:8px;
+    font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+  }
+  .icon-btn:hover{border-color:#6a5acd;color:#fff;}
+  .stage{
+    height:calc(100% - 57px);display:flex;align-items:center;justify-content:center;
+    overflow:auto;padding:24px;
+  }
+  .device-frame{
+    background:#000;border-radius:4px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);
+    transform-origin:center center;flex-shrink:0;position:relative;overflow:hidden;
+  }
+  .device-frame.is-mobile{border-radius:34px;border:8px solid #111;box-shadow:0 30px 80px -20px rgba(0,0,0,.8), 0 0 0 1px #333;}
+  .device-frame.is-tablet{border-radius:20px;border:8px solid #111;box-shadow:0 30px 80px -20px rgba(0,0,0,.8), 0 0 0 1px #333;}
+  .device-frame iframe{display:block;border:none;background:#fff;}
+  .dims{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);font-size:11.5px;color:#7a7a90;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <label for="fileSelect">Файл</label>
+  <select id="fileSelect"></select>
+  <div class="device-btns" id="deviceBtns">
+    <button data-device="desktop" class="is-active">Десктоп</button>
+    <button data-device="tablet">Планшет</button>
+    <button data-device="mobile">Мобильный</button>
+  </div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="refreshBtn" title="Перезагрузить">⟳ Обновить</button>
+  <a class="icon-btn" id="openTabBtn" href="#" target="_blank" title="Открыть в новой вкладке">↗ В новой вкладке</a>
+</div>
+
+<div class="stage" id="stage">
+  <div class="device-frame" id="deviceFrame">
+    <iframe id="previewFrame"></iframe>
+    <div class="dims" id="dims"></div>
+  </div>
+</div>
+
+<script>
+var FILES = [
+  ["variant-17-lilac-sky.html", "Раунд 6 — Lilac Sky"],
+  ["variant-18-sicilian-sun.html", "Раунд 6 — Летнее сияние"],
+  ["variant-12-baroque-silk-drape.html", "Silk Drape (дорабатывается)"],
+  ["index.html", "Индекс — хронология дизайна"],
+  ["variant-1-nezhny.html", "Вариант 1 — Нежный"],
+  ["variant-2-lux.html", "Вариант 2 — Lux"],
+  ["variant-2b-lux-glow.html", "Вариант 2b — Lux Glow"],
+  ["variant-3-yarky.html", "Вариант 3 — Яркий"],
+  ["variant-4-sicilian-baroque.html", "Вариант 4 — Sicilian Baroque"],
+  ["variant-4-sicilian-baroque-v2.html", "Вариант 4 v2"],
+  ["variant-4-sicilian-baroque-v3.html", "Вариант 4 v3"],
+  ["variant-5-leopard-noir.html", "Вариант 5 — Leopard Noir"],
+  ["variant-5-leopard-noir-v2.html", "Вариант 5 v2"],
+  ["variant-6-scarlatto.html", "Вариант 6 — Scarlatto"],
+  ["variant-6-scarlatto-v2.html", "Вариант 6 v2"],
+  ["variant-7-majolica.html", "Вариант 7 — Majolica"],
+  ["variant-7-majolica-v2.html", "Вариант 7 v2"],
+  ["variant-8-cinema-glam.html", "Вариант 8 — Cinema Glam"],
+  ["variant-8-cinema-glam-v2.html", "Вариант 8 v2"],
+  ["variant-9-baroque-imperial.html", "Вариант 9 — Imperial"],
+  ["variant-10-baroque-noir-minimal.html", "Вариант 10 — Noir Minimal"],
+  ["variant-11-baroque-botanical.html", "Вариант 11 — Botanical"],
+  ["variant-13-baroque-aurora.html", "Вариант 13 — Aurora"],
+  ["variant-14-baroque-celestial.html", "Вариант 14 — Celestial"],
+  ["variant-15-baroque-portal.html", "Вариант 15 — Portal"],
+  ["variant-16-fairytale-clouds.html", "Вариант 16 — Fairytale Clouds"]
+];
+
+var DEVICES = {
+  desktop: {w:1440, h:900},
+  tablet:  {w:834,  h:1194},
+  mobile:  {w:390,  h:844}
+};
+
+var select = document.getElementById('fileSelect');
+var frame = document.getElementById('previewFrame');
+var deviceFrame = document.getElementById('deviceFrame');
+var dims = document.getElementById('dims');
+var stage = document.getElementById('stage');
+var openTabBtn = document.getElementById('openTabBtn');
+
+FILES.forEach(function(f){
+  var opt = document.createElement('option');
+  opt.value = f[0];
+  opt.textContent = f[1];
+  select.appendChild(opt);
+});
+
+var state = { file: null, device: 'desktop' };
+try{
+  var saved = JSON.parse(localStorage.getItem('lashPreviewState') || '{}');
+  if(saved.file) state.file = saved.file;
+  if(saved.device) state.device = saved.device;
+}catch(e){}
+
+var qp = new URLSearchParams(location.search);
+if(qp.get('file')) state.file = qp.get('file');
+if(!state.file) state.file = FILES[0][0];
+if(!DEVICES[state.device]) state.device = 'desktop';
+
+function save(){
+  try{ localStorage.setItem('lashPreviewState', JSON.stringify(state)); }catch(e){}
+}
+
+function applyDeviceClass(){
+  deviceFrame.classList.remove('is-mobile','is-tablet','is-desktop');
+  deviceFrame.classList.add('is-' + state.device);
+  document.querySelectorAll('.device-btns button').forEach(function(b){
+    b.classList.toggle('is-active', b.dataset.device === state.device);
+  });
+}
+
+function fitScale(){
+  var d = DEVICES[state.device];
+  var pad = 48;
+  var availW = stage.clientWidth - pad;
+  var availH = stage.clientHeight - pad - 30; // leave room for dims label
+  var scale = Math.min(1, availW / d.w, availH / d.h);
+  deviceFrame.style.transform = 'scale(' + scale + ')';
+}
+
+function render(){
+  var d = DEVICES[state.device];
+  frame.style.width = d.w + 'px';
+  frame.style.height = d.h + 'px';
+  applyDeviceClass();
+  fitScale();
+  dims.textContent = d.w + ' × ' + d.h + ' px';
+  select.value = state.file;
+  var src = state.file;
+  if(frame.getAttribute('data-src') !== src){
+    frame.src = src;
+    frame.setAttribute('data-src', src);
+  }
+  openTabBtn.href = state.file;
+  save();
+}
+
+select.addEventListener('change', function(){
+  state.file = select.value;
+  render();
+});
+
+document.getElementById('deviceBtns').addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-device]');
+  if(!btn) return;
+  state.device = btn.dataset.device;
+  render();
+});
+
+document.getElementById('refreshBtn').addEventListener('click', function(){
+  frame.src = frame.src;
+});
+
+window.addEventListener('resize', fitScale);
+
+render();
+</script>
+</body>
+</html>

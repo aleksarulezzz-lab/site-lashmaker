@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LASH POP — студия ресниц</title>
+<meta name="description" content="Наращивание и ламинирование ресниц. Яркая студия, смелые эффекты. Запись онлайн, портфолио, отзывы.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf9ff;
+    --bg-soft:#f1ecff;
+    --surface:#ffffff;
+    --ink:#1b1030;
+    --ink-soft:#6a5f85;
+    --accent:#ff3d8a;
+    --accent-strong:#e01f6d;
+    --accent-2:#7c3aed;
+    --accent-3:#ffb020;
+    --border:#e7defc;
+    --shadow: 0 24px 50px -20px rgba(124,58,237,.35);
+    --radius-lg: 28px;
+    --radius-md: 20px;
+    --radius-sm: 16px;
+    --font-head: 'Unbounded', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --grad: linear-gradient(120deg,#7c3aed,#ff3d8a 55%,#ffb020);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);
+    font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;margin:0 0 .5em;color:var(--ink);letter-spacing:-.01em;}
+  p{margin:0 0 1em;}
+  .container{max-width:1180px;margin:0 auto;padding:0 24px;}
+  .section{padding:96px 0;}
+  .section-alt{background:var(--bg-soft);}
+  .eyebrow{
+    display:inline-block;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:12.5px;
+    color:#fff;background:var(--grad);padding:8px 18px;border-radius:100px;margin-bottom:18px;
+  }
+  .section-head{max-width:640px;margin:0 auto 52px;text-align:center;}
+  .section-head h2{font-size:clamp(28px,4.2vw,42px);}
+  .section-head p{color:var(--ink-soft);font-size:17px;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:16px 32px;border-radius:100px;
+    font-family:var(--font-head);font-weight:600;font-size:14.5px;cursor:pointer;border:2px solid transparent;
+    text-decoration:none;transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:var(--shadow);}
+  .btn-primary:hover{transform:translateY(-3px) scale(1.02);}
+  .btn-outline{background:#fff;border-color:var(--accent-2);color:var(--accent-2);}
+  .btn-outline:hover{background:var(--bg-soft);}
+  .btn-block{width:100%;}
+  header.site-header{
+    position:sticky;top:0;z-index:50;background:rgba(251,249,255,.88);
+    backdrop-filter:blur(10px);border-bottom:2px solid var(--border);
+  }
+  .header-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1230px;margin:0 auto;gap:20px;}
+  .logo{font-family:var(--font-head);font-size:22px;font-weight:800;}
+  .logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .logo small{display:block;font-family:var(--font-body);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;}
+  nav.nav{display:flex;align-items:center;gap:22px;}
+  nav.nav a{font-size:14px;font-weight:600;text-decoration:none;color:var(--ink);opacity:.75;}
+  nav.nav a:hover{opacity:1;color:var(--accent-strong);}
+  .header-actions{display:flex;align-items:center;gap:16px;}
+  .header-phone{font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;color:var(--accent-2);flex-shrink:0;}
+  .nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;}
+  .nav-toggle span{width:24px;height:3px;border-radius:2px;background:var(--accent-2);}
+  .hero{padding:64px 0 90px;position:relative;overflow:hidden;}
+  .hero::before{
+    content:'';position:absolute;top:-260px;left:-120px;width:560px;height:560px;border-radius:50%;
+    background:var(--grad);opacity:.18;filter:blur(40px);
+  }
+  .hero-inner{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;position:relative;}
+  .hero h1{font-size:clamp(34px,5vw,58px);line-height:1.08;}
+  .hero h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero p.lead{font-size:18px;color:var(--ink-soft);max-width:460px;}
+  .hero-cta{display:flex;gap:16px;margin-top:32px;flex-wrap:wrap;}
+  .hero-stats{display:flex;gap:14px;margin-top:44px;flex-wrap:wrap;}
+  .hero-stats div{background:#fff;border:2px solid var(--border);border-radius:100px;padding:10px 20px;}
+  .hero-stats div b{font-family:var(--font-head);font-size:16px;color:var(--accent-strong);margin-right:6px;}
+  .hero-stats div span{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .hero-visual{position:relative;display:flex;align-items:center;justify-content:center;}
+  .hero-card{
+    position:relative;background:var(--surface);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow);padding:34px;width:100%;max-width:420px;border:3px solid var(--ink);
+    transform:rotate(-2deg);
+  }
+  .hero-card .lash-svg{width:100%;height:auto;color:var(--accent-2);}
+  .hero-card-caption{text-align:center;margin-top:14px;font-size:13.5px;color:var(--ink-soft);font-weight:700;}
+  .hero-badge{
+    position:absolute;top:-18px;right:-18px;background:var(--accent-3);color:var(--ink);
+    font-family:var(--font-head);font-weight:800;font-size:13px;padding:12px 16px;border-radius:50%;
+    width:76px;height:76px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;
+    border:3px solid var(--ink);transform:rotate(8deg);
+  }
+  .services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;}
+  .service-card{background:var(--surface);border:2px solid var(--ink);border-radius:var(--radius-md);padding:32px;box-shadow:6px 6px 0 var(--accent-2);}
+  .service-card h3{font-size:21px;}
+  .service-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:2px dashed var(--border);font-size:15px;font-weight:500;}
+  .service-row:last-child{border-bottom:none;}
+  .service-row span:last-child{color:var(--accent-strong);font-weight:800;white-space:nowrap;}
+  .service-note{margin-top:14px;font-size:13px;color:var(--ink-soft);}
+  .filters{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:40px;}
+  .filter-btn{
+    padding:10px 20px;border-radius:100px;border:2px solid var(--ink);background:#fff;
+    font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;font-family:var(--font-head);
+  }
+  .filter-btn.is-active,.filter-btn:hover{background:var(--grad);border-color:transparent;color:#fff;}
+  .portfolio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .photo-card{border-radius:var(--radius-sm);overflow:hidden;background:var(--surface);border:2px solid var(--ink);}
+  .photo-thumb{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;background:var(--grad);}
+  .photo-thumb svg{width:50%;color:#fff;}
+  .photo-cap{padding:14px 16px;font-size:13.5px;font-weight:700;}
+  .photo-cap span{display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft);margin-top:2px;text-transform:uppercase;}
+  .curl-tabs{display:flex;justify-content:center;gap:10px;margin-bottom:40px;flex-wrap:wrap;}
+  .curl-tab{
+    padding:12px 26px;border-radius:100px;border:2px solid var(--ink);background:#fff;
+    font-family:var(--font-head);font-weight:700;font-size:17px;color:var(--ink);cursor:pointer;transition:.15s;
+  }
+  .curl-tab.is-active{background:var(--grad);border-color:transparent;color:#fff;}
+  .showcase{
+    display:grid;grid-template-columns:.9fr 1.1fr;background:var(--surface);
+    border:2px solid var(--ink);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:52px;box-shadow:8px 8px 0 var(--accent-3);
+  }
+  .showcase-visual{background:var(--bg-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:38px;gap:20px;}
+  .showcase-visual .lash-svg{width:100%;max-width:340px;color:var(--accent-2);}
+  .showcase-text-wrap{padding:42px 44px;}
+  .showcase-title{font-size:25px;margin-bottom:8px;}
+  .showcase-eye{font-weight:800;color:var(--accent-strong);font-size:14px;margin-bottom:14px;}
+  .showcase-text{color:var(--ink-soft);font-size:15.5px;}
+  .lash-toggle{display:inline-flex;background:#fff;border:2px solid var(--ink);border-radius:100px;padding:4px;}
+  .lash-toggle button{border:none;background:none;padding:8px 18px;border-radius:100px;font-weight:700;font-size:13px;cursor:pointer;color:var(--ink-soft);font-family:var(--font-head);}
+  .lash-toggle button.is-active{background:var(--ink);color:#fff;}
+  .curl-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .curl-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-md);padding:22px;text-align:center;transition:.2s;opacity:.55;}
+  .curl-card.is-recommended{opacity:1;border-color:var(--ink);box-shadow:6px 6px 0 var(--accent);}
+  .curl-card h4{font-size:16px;margin-bottom:4px;}
+  .curl-card .curl-badge{font-size:11px;font-weight:800;color:#fff;background:var(--grad);display:inline-block;padding:4px 12px;border-radius:100px;margin-bottom:10px;}
+  .curl-card .lash-svg{width:100%;height:auto;margin:12px 0;color:var(--accent-2);}
+  .curl-card p{font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
+  .care-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .care-card{background:var(--surface);border:2px solid var(--ink);border-radius:var(--radius-md);padding:26px;box-shadow:5px 5px 0 var(--accent-3);}
+  .care-num{
+    width:36px;height:36px;border-radius:50%;background:var(--grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:15px;margin-bottom:14px;
+  }
+  .care-card h4{font-size:16.5px;}
+  .care-card p{font-size:14px;color:var(--ink-soft);margin:0;}
+  .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .review-card{background:var(--surface);border:2px solid var(--ink);border-radius:var(--radius-md);padding:26px;box-shadow:5px 5px 0 var(--accent-2);}
+  .stars{color:var(--accent-3);font-size:16px;letter-spacing:2px;margin-bottom:12px;}
+  .review-card p{font-size:14.5px;color:var(--ink);}
+  .review-author{display:flex;align-items:center;gap:12px;margin-top:16px;}
+  .review-avatar{width:38px;height:38px;border-radius:50%;background:var(--grad);flex-shrink:0;}
+  .review-author b{display:block;font-size:14px;}
+  .review-author span{font-size:12px;color:var(--ink-soft);}
+  .booking-wrap{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;border:2px solid var(--ink);box-shadow:10px 10px 0 var(--accent-2);}
+  .booking-info{background:var(--grad);color:#fff;padding:48px 42px;}
+  .booking-info h3{color:#fff;font-size:26px;}
+  .booking-info p{color:rgba(255,255,255,.9);}
+  .booking-info ul{list-style:none;padding:0;margin:26px 0 0;}
+  .booking-info li{display:flex;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.28);font-size:14.5px;font-weight:600;}
+  .booking-info li:first-child{border-top:none;}
+  .booking-form{padding:48px 42px;}
+  .form-row{margin-bottom:18px;}
+  .form-row label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--ink-soft);}
+  .form-row input, .form-row select{
+    width:100%;padding:13px 16px;border-radius:var(--radius-sm);border:2px solid var(--border);
+    font-family:var(--font-body);font-size:15px;background:var(--bg-soft);color:var(--ink);
+  }
+  .form-row input:focus, .form-row select:focus{outline:none;border-color:var(--accent-2);}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-msg{margin-top:14px;font-size:14px;font-weight:700;min-height:20px;}
+  .form-msg.is-success{color:#1c9c6b;}
+  .form-msg.is-error{color:var(--accent-strong);}
+  .contacts-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;}
+  .contacts-map{
+    aspect-ratio:4/3;border-radius:var(--radius-lg);background:var(--grad);
+    border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;
+  }
+  .contacts-map svg{width:56px;color:#fff;}
+  .contact-item{display:flex;gap:16px;margin-bottom:20px;}
+  .contact-icon{width:44px;height:44px;border-radius:50%;background:var(--bg-soft);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .contact-item h4{margin:0 0 3px;font-size:15.5px;}
+  .contact-item p{margin:0;color:var(--ink-soft);font-size:14.5px;}
+  .social-row{display:flex;gap:12px;margin-top:24px;}
+  .social-row a{
+    width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;
+    color:var(--accent-2);text-decoration:none;border:2px solid var(--ink);font-weight:800;font-size:11px;transition:.15s;
+  }
+  .social-row a:hover{background:var(--grad);color:#fff;border-color:transparent;}
+  footer{padding:40px 0;text-align:center;color:var(--ink-soft);font-size:13.5px;border-top:2px solid var(--border);}
+  footer b{color:var(--ink);}
+  .lash-stroke{stroke:currentColor;}
+  .lid-stroke{stroke:var(--ink);stroke-width:2.6;}
+  .lower-stroke{stroke:var(--ink-soft);stroke-width:1;opacity:.5;}
+  .iris-shape{fill:var(--accent-3);opacity:.6;}
+  .pupil-shape{fill:var(--ink);}
+  @media(max-width:980px){
+    .services-grid,.care-grid,.reviews-grid{grid-template-columns:repeat(2,1fr);}
+    .portfolio-grid{grid-template-columns:repeat(3,1fr);}
+    .curl-cards{grid-template-columns:repeat(2,1fr);}
+    .hero-inner{grid-template-columns:1fr;text-align:center;}
+    .hero p.lead{margin:0 auto;}
+    .hero-cta,.hero-stats{justify-content:center;}
+    .hero-visual{margin-top:30px;}
+    .showcase{grid-template-columns:1fr;}
+    .booking-wrap{grid-template-columns:1fr;}
+    .contacts-grid{grid-template-columns:1fr;}
+  }
+  @media(max-width:1180px){
+    nav.nav{
+      position:fixed;top:69px;left:0;right:0;background:var(--bg);flex-direction:column;
+      padding:20px 24px 30px;gap:2px;border-bottom:2px solid var(--border);
+      transform:translateY(-130%);opacity:0;transition:.25s;
+    }
+    nav.nav.is-open{transform:translateY(0);opacity:1;}
+    nav.nav a{padding:12px 0;width:100%;border-bottom:1px solid var(--border);}
+    .nav-toggle{display:flex;}
+    .header-phone{display:none;}
+  }
+  @media(max-width:720px){
+    
+    
+    .section{padding:60px 0;}
+    .services-grid,.care-grid,.reviews-grid,.portfolio-grid,.curl-cards{grid-template-columns:1fr;}
+    .form-grid-2{grid-template-columns:1fr;}
+    .booking-info,.booking-form{padding:32px 24px;}
+    .curl-tabs{gap:8px;}
+    .curl-tab{padding:10px 18px;font-size:15px;}
+    .hero-card{transform:none;}
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">LASH<span>POP</span><small>studio ресниц</small></div>
+    <nav class="nav">
+      <a href="#services">Услуги</a>
+      <a href="#portfolio">Портфолио</a>
+      <a href="#curls">Изгибы</a>
+      <a href="#care">Уход</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <div class="header-actions">
+      <a class="header-phone" href="tel:+79991234567">+7 (999) 123-45-67</a>
+      <a href="#booking" class="btn btn-primary">Записаться</a>
+      <button class="nav-toggle" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+<section class="hero" id="top">
+  <div class="container hero-inner">
+    <div>
+      <h1>Взгляд, который <span>жжёт</span> 🔥</h1>
+      <p class="lead">Наращивание и ламинирование ресниц без скучных стандартов. Смелые эффекты, честные цены и результат, ради которого хочется делать сторис.</p>
+      <div class="hero-cta">
+        <a href="#booking" class="btn btn-primary">Записаться на процедуру</a>
+        <a href="#services" class="btn btn-outline">Смотреть цены</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>6 лет</b><span>опыта</span></div>
+        <div><b>2400+</b><span>клиенток</span></div>
+        <div><b>4.9</b><span>рейтинг</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-badge">−20% первым клиенткам</div>
+        <svg class="lash-svg" id="heroLash" viewBox="0 0 220 140"></svg>
+        <div class="hero-card-caption">Изгиб CC · эффект «после»</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Услуги и цены</span>
+      <h2>Подберём формат под ваш взгляд</h2>
+      <p>Все цены указаны от базовой стоимости — точная сумма зависит от густоты натуральных ресниц и выбранного эффекта.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <h3>Наращивание ресниц</h3>
+        <div class="service-row"><span>Классическое (1D)</span><span>от 2 200 ₽</span></div>
+        <div class="service-row"><span>Голливудское 2D</span><span>от 2 600 ₽</span></div>
+        <div class="service-row"><span>Объёмное 3D–5D</span><span>от 2 900 ₽</span></div>
+        <div class="service-row"><span>Мега объём / Wet-эффект</span><span>от 3 400 ₽</span></div>
+        <div class="service-row"><span>Цветные / акцентные ресницы</span><span>+400 ₽</span></div>
+        <p class="service-note">В стоимость входит консультация по изгибу и длине.</p>
+      </div>
+      <div class="service-card">
+        <h3>Ламинирование</h3>
+        <div class="service-row"><span>Ламинирование + ботокс + окрашивание</span><span>от 2 800 ₽</span></div>
+        <div class="service-row"><span>Ламинирование ресниц и бровей</span><span>от 3 900 ₽</span></div>
+        <div class="service-row"><span>Ламинирование бровей</span><span>от 1 800 ₽</span></div>
+        <p class="service-note">Эффект держится 6–8 недель, подходит для отдыха от нарощенных ресниц.</p>
+      </div>
+      <div class="service-card">
+        <h3>Коррекция и снятие</h3>
+        <div class="service-row"><span>Коррекция до 2 недель</span><span>от 1 500 ₽</span></div>
+        <div class="service-row"><span>Коррекция до 3 недель</span><span>от 1 800 ₽</span></div>
+        <div class="service-row"><span>Снятие ресниц (не наш мастер)</span><span>500 ₽</span></div>
+        <p class="service-note">После 3 недель рекомендуем полное наращивание — так результат выглядит аккуратнее.</p>
+      </div>
+      <div class="service-card">
+        <h3>Обучение</h3>
+        <div class="service-row"><span>Базовый курс наращивания (3 дня)</span><span>25 000 ₽</span></div>
+        <div class="service-row"><span>Курс ламинирования (1 день)</span><span>12 000 ₽</span></div>
+        <div class="service-row"><span>Индивидуальное занятие / разбор</span><span>4 000 ₽/час</span></div>
+        <p class="service-note">Выдаём сертификат, помогаем с подбором стартового набора материалов.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section-alt" id="portfolio">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Портфолио</span>
+      <h2>Работы студии</h2>
+      <p>Небольшая подборка эффектов, которые чаще всего выбирают наши клиентки.</p>
+    </div>
+    <div class="filters">
+      <button class="filter-btn is-active" data-filter="all">Все работы</button>
+      <button class="filter-btn" data-filter="classic">Классика</button>
+      <button class="filter-btn" data-filter="volume2d">2D</button>
+      <button class="filter-btn" data-filter="volume3d">3D–5D</button>
+      <button class="filter-btn" data-filter="lamination">Ламинирование</button>
+    </div>
+    <div class="portfolio-grid" id="portfolioGrid"></div>
+  </div>
+</section>
+<section class="section" id="curls">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Виды изгибов</span>
+      <h2>Какой изгиб подойдёт именно вам</h2>
+      <p>Изгиб определяет, насколько сильно приподняты кончики ресниц. Жми на буквы — покажем «до» и «после» на примерах.</p>
+    </div>
+    <div class="curl-tabs">
+      <button class="curl-tab" data-curl="b">B</button>
+      <button class="curl-tab" data-curl="c">C</button>
+      <button class="curl-tab is-active" data-curl="cc">CC</button>
+      <button class="curl-tab" data-curl="d">D</button>
+    </div>
+    <div class="showcase" id="curlShowcase" data-curl="cc" data-state="after">
+      <div class="showcase-visual">
+        <svg class="lash-svg" viewBox="0 0 220 140"></svg>
+        <div class="lash-toggle">
+          <button data-state="before">До</button>
+          <button class="is-active" data-state="after">После</button>
+        </div>
+      </div>
+      <div class="showcase-text-wrap">
+        <h3 class="showcase-title">Усиленный изгиб CC</h3>
+        <div class="showcase-eye">Кому подходит:</div>
+        <p class="showcase-text"></p>
+      </div>
+    </div>
+    <div class="curl-cards" id="curlCards"></div>
+  </div>
+</section>
+<section class="section section-alt" id="care">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Уход</span>
+      <h2>Как ухаживать за наращенными ресницами</h2>
+      <p>Несколько простых правил — и ресницы будут выглядеть свежо весь срок носки.</p>
+    </div>
+    <div class="care-grid" id="careGrid"></div>
+  </div>
+</section>
+<section class="section" id="reviews">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Отзывы</span>
+      <h2>Что говорят клиентки</h2>
+    </div>
+    <div class="reviews-grid" id="reviewsGrid"></div>
+  </div>
+</section>
+<section class="section section-alt" id="booking">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Запись онлайн</span>
+      <h2>Забронировать время</h2>
+      <p>Заполните форму — мастер свяжется с вами в течение дня, чтобы подтвердить дату и время.</p>
+    </div>
+    <div class="booking-wrap">
+      <div class="booking-info">
+        <h3>LASH POP studio</h3>
+        <p>Работаем на премиальных материалах, соблюдаем стерильность и любим яркие результаты — без компромиссов по качеству.</p>
+        <ul>
+          <li>📍 Москва, ул. Тверская, 14</li>
+          <li>🕙 Пн–Сб: 10:00–20:00, Вс — выходной</li>
+          <li>📞 +7 (999) 123-45-67</li>
+        </ul>
+      </div>
+      <form class="booking-form" id="bookingForm">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label for="name">Имя</label>
+            <input type="text" id="name" name="name" placeholder="Как к вам обращаться" required>
+          </div>
+          <div class="form-row">
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" name="phone" placeholder="+7 (___) ___-__-__" required>
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label for="date">Желаемая дата</label>
+            <input type="date" id="date" name="date" required>
+          </div>
+          <div class="form-row">
+            <label for="service">Услуга</label>
+            <select id="service" name="service" required>
+              <option value="">Выберите услугу</option>
+              <option>Классическое наращивание</option>
+              <option>2D объём</option>
+              <option>3D–5D объём</option>
+              <option>Мега объём</option>
+              <option>Ламинирование ресниц</option>
+              <option>Коррекция</option>
+              <option>Снятие ресниц</option>
+              <option>Обучение / консультация</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Отправить заявку</button>
+        <div class="form-msg" id="formMsg"></div>
+      </form>
+    </div>
+  </div>
+</section>
+<section class="section" id="contacts">
+  <div class="container contacts-grid">
+    <div class="contacts-map">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+    </div>
+    <div>
+      <span class="eyebrow">Контакты</span>
+      <h2>Ждём вас в студии</h2>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div><h4>Адрес</h4><p>Москва, ул. Тверская, 14, LASH POP studio</p></div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div><h4>Телефон</h4><p><a href="tel:+79991234567">+7 (999) 123-45-67</a></p></div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">🕙</div>
+        <div><h4>Часы работы</h4><p>Пн–Сб: 10:00–20:00, Вс — выходной</p></div>
+      </div>
+      <div class="social-row">
+        <a href="#" title="Instagram">IG</a>
+        <a href="#" title="WhatsApp">WA</a>
+        <a href="#" title="Telegram">TG</a>
+        <a href="#" title="VK">VK</a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="container">© 2026 <b>LASH POP studio</b> · Виктория Соколова, мастер по наращиванию и ламинированию ресниц</div>
+</footer>
+<script>
+const CURL_DATA = {
+  b:  { label:'B', name:'Лёгкий изгиб B', bend:16, eye:'Нависшее веко, прямые от природы ресницы', text:'Мягкий, почти незаметный подъём. Сохраняет естественность и не утяжеляет взгляд — изгиб не «утыкается» в складку века, поэтому идеален при нависшем веке.' },
+  c:  { label:'C', name:'Классический изгиб C', bend:36, eye:'Миндалевидные и близко посаженные глаза', text:'Самый популярный изгиб. Аккуратно распахивает взгляд и подходит практически любой форме глаз — универсальный выбор «на каждый день».' },
+  cc: { label:'CC', name:'Усиленный изгиб CC', bend:54, eye:'Круглые и глубоко посаженные глаза', text:'Среднее между C и D: заметный подъём и эффект макияжа без излишней театральности. Хорошо открывает глубоко посаженные глаза.' },
+  d:  { label:'D', name:'Максимальный изгиб D', bend:74, eye:'Монолид, азиатский разрез глаз', text:'Самый крутой изгиб для эффекта «кукольного» распахнутого взгляда. Отлично держит форму на монолиде и подходит тем, кто привык к накладным ресницам.' }
+};
+function lashPath(svg, curlKey, after){
+  const ns='http://www.w3.org/2000/svg';
+  svg.innerHTML='';
+  const bend = after ? CURL_DATA[curlKey].bend : 10;
+  const count = after ? 11 : 6;
+  const lenBase = after ? 46 : 26;
+  const strokeW = after ? 2.6 : 1.6;
+  const roots=[];
+  for(let i=0;i<count;i++){
+    const t=i/(count-1);
+    roots.push({x:30+t*160, y:95-16*Math.sin(Math.PI*t), t});
+  }
+  const mid = roots[Math.floor((count-1)/2)];
+  const iris=document.createElementNS(ns,'ellipse');
+  iris.setAttribute('cx',mid.x); iris.setAttribute('cy',mid.y+24);
+  iris.setAttribute('rx',24); iris.setAttribute('ry',14);
+  iris.setAttribute('class','iris-shape');
+  svg.appendChild(iris);
+  const pupil=document.createElementNS(ns,'circle');
+  pupil.setAttribute('cx',mid.x); pupil.setAttribute('cy',mid.y+24); pupil.setAttribute('r',6);
+  pupil.setAttribute('class','pupil-shape');
+  svg.appendChild(pupil);
+  const lower=document.createElementNS(ns,'path');
+  lower.setAttribute('d', `M ${roots[0].x},${roots[0].y+2} Q ${mid.x},${mid.y+38} ${roots[count-1].x},${roots[count-1].y+2}`);
+  lower.setAttribute('class','lower-stroke'); lower.setAttribute('fill','none');
+  svg.appendChild(lower);
+  roots.forEach(r=>{
+    const a=-100 + r.t*30;
+    const rad=a*Math.PI/180;
+    const d0={x:Math.cos(rad),y:Math.sin(rad)};
+    const L=lenBase*(0.7+0.5*r.t);
+    const p1={x:r.x+d0.x*L*0.55, y:r.y+d0.y*L*0.55};
+    const b2=a-bend, rad2=b2*Math.PI/180;
+    const d1={x:Math.cos(rad2),y:Math.sin(rad2)};
+    const p2={x:p1.x+d1.x*L*0.45, y:p1.y+d1.y*L*0.45};
+    const path=document.createElementNS(ns,'path');
+    path.setAttribute('d',`M ${r.x.toFixed(1)},${r.y.toFixed(1)} Q ${p1.x.toFixed(1)},${p1.y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`);
+    path.setAttribute('class','lash-stroke');
+    path.setAttribute('stroke-width',strokeW);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke-linecap','round');
+    svg.appendChild(path);
+  });
+  const lid=document.createElementNS(ns,'path');
+  lid.setAttribute('d', `M ${roots[0].x},${roots[0].y} Q ${mid.x},${mid.y-6} ${roots[count-1].x},${roots[count-1].y}`);
+  lid.setAttribute('class','lid-stroke'); lid.setAttribute('fill','none');
+  svg.appendChild(lid);
+}
+lashPath(document.getElementById('heroLash'), 'cc', true);
+const PORTFOLIO = [
+  {cat:'classic', title:'Классика', sub:'нежный эффект'},
+  {cat:'volume2d', title:'2D объём', sub:'лёгкая пушистость'},
+  {cat:'volume3d', title:'3D объём', sub:'эффект макияжа'},
+  {cat:'lamination', title:'Ламинирование', sub:'+ ботокс ресниц'},
+  {cat:'classic', title:'Классика', sub:'коричневый микс'},
+  {cat:'volume2d', title:'Голливудский 2D', sub:'акцент на внешний уголок'},
+  {cat:'volume3d', title:'Мега объём', sub:'4D–5D'},
+  {cat:'lamination', title:'Ламинирование', sub:'ресниц и бровей'},
+];
+const grid = document.getElementById('portfolioGrid');
+PORTFOLIO.forEach(item=>{
+  const div = document.createElement('div');
+  div.className='photo-card';
+  div.dataset.category=item.cat;
+  div.innerHTML = `<div class="photo-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg></div>
+  <div class="photo-cap">${item.title}<span>${item.sub}</span></div>`;
+  grid.appendChild(div);
+});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const cat = btn.dataset.filter;
+    document.querySelectorAll('.photo-card').forEach(card=>{
+      card.style.display = (cat==='all' || card.dataset.category===cat) ? '' : 'none';
+    });
+  });
+});
+const MODELS = [
+  {curl:'b', title:'Нависшее веко', text:'Сохраняем лёгкость, не утяжеляя складку века.'},
+  {curl:'c', title:'Миндалевидные глаза', text:'Универсальный вариант на каждый день.'},
+  {curl:'cc', title:'Глубоко посаженные', text:'Дополнительно открываем взгляд.'},
+  {curl:'d', title:'Монолид', text:'Максимальный подъём и эффект распахнутых глаз.'},
+];
+const curlCardsWrap = document.getElementById('curlCards');
+MODELS.forEach(m=>{
+  const card=document.createElement('div');
+  card.className='curl-card';
+  card.dataset.curl=m.curl;
+  card.dataset.state='before';
+  card.innerHTML = `
+    <div class="curl-badge">Изгиб ${CURL_DATA[m.curl].label}</div>
+    <h4>${m.title}</h4>
+    <svg class="lash-svg" viewBox="0 0 220 140"></svg>
+    <p>${m.text}</p>
+    <div class="lash-toggle">
+      <button class="is-active" data-state="before">До</button>
+      <button data-state="after">После</button>
+    </div>`;
+  curlCardsWrap.appendChild(card);
+  lashPath(card.querySelector('.lash-svg'), m.curl, false);
+});
+curlCardsWrap.addEventListener('click', e=>{
+  const btn = e.target.closest('.lash-toggle button');
+  if(!btn) return;
+  const card = btn.closest('.curl-card');
+  card.querySelectorAll('.lash-toggle button').forEach(b=>b.classList.remove('is-active'));
+  btn.classList.add('is-active');
+  const state = btn.dataset.state;
+  card.dataset.state = state;
+  lashPath(card.querySelector('.lash-svg'), card.dataset.curl, state==='after');
+});
+const showcase = document.getElementById('curlShowcase');
+function renderShowcase(key){
+  const d = CURL_DATA[key];
+  showcase.querySelector('.showcase-title').textContent = d.name;
+  showcase.querySelector('.showcase-text').textContent = d.text;
+  showcase.querySelector('.showcase-eye').textContent = 'Кому подходит: ' + d.eye;
+  showcase.dataset.curl = key;
+  const state = showcase.dataset.state || 'after';
+  lashPath(showcase.querySelector('.lash-svg'), key, state==='after');
+  document.querySelectorAll('.curl-card').forEach(card=>{
+    card.classList.toggle('is-recommended', card.dataset.curl===key);
+  });
+}
+document.querySelectorAll('.curl-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.curl-tab').forEach(t=>t.classList.remove('is-active'));
+    tab.classList.add('is-active');
+    renderShowcase(tab.dataset.curl);
+  });
+});
+showcase.querySelectorAll('.lash-toggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    showcase.querySelectorAll('.lash-toggle button').forEach(b=>b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    showcase.dataset.state = btn.dataset.state;
+    lashPath(showcase.querySelector('.lash-svg'), showcase.dataset.curl, btn.dataset.state==='after');
+  });
+});
+renderShowcase('cc');
+const CARE = [
+  'Не мочите ресницы первые 4 часа после процедуры — клей набирает полную прочность.',
+  'Расчёсывайте ресницы специальной щёточкой утром и вечером — это сохраняет форму.',
+  'Избегайте средств с маслами в составе: они разрушают клеевую связку.',
+  'Спите на спине или используйте шёлковую наволочку, чтобы ресницы не заламывались.',
+  'Не трите глаза руками и откажитесь от водостойкой туши на нарощенных ресницах.',
+  'Приходите на коррекцию каждые 2–3 недели — так взгляд всегда выглядит свежо.',
+];
+const careGrid = document.getElementById('careGrid');
+CARE.forEach((text,i)=>{
+  const el=document.createElement('div');
+  el.className='care-card';
+  el.innerHTML = `<div class="care-num">${i+1}</div><h4>Совет ${i+1}</h4><p>${text}</p>`;
+  careGrid.appendChild(el);
+});
+const REVIEWS = [
+  {name:'Анна, 27 лет', text:'Хожу к Виктории уже год — ресницы всегда выглядят натурально и держатся до самой коррекции. Очень аккуратная работа!'},
+  {name:'Марина К.', text:'Делала 2D перед свадьбой — фотографии вышли потрясающие, глаза совсем другие. Спасибо огромное!'},
+  {name:'Ольга', text:'Ламинирование ресниц — находка. Месяц не крашу их, а взгляд всегда выглядит свежим и приподнятым.'},
+];
+const reviewsGrid = document.getElementById('reviewsGrid');
+REVIEWS.forEach(r=>{
+  const el=document.createElement('div');
+  el.className='review-card';
+  el.innerHTML = `<div class="stars">★★★★★</div><p>«${r.text}»</p>
+  <div class="review-author"><div class="review-avatar"></div><div><b>${r.name}</b><span>клиентка LASH POP</span></div></div>`;
+  reviewsGrid.appendChild(el);
+});
+const navToggle = document.querySelector('.nav-toggle');
+const nav = document.querySelector('.nav');
+navToggle.addEventListener('click', ()=>nav.classList.toggle('is-open'));
+document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('is-open')));
+const dateInput = document.getElementById('date');
+dateInput.min = new Date().toISOString().split('T')[0];
+const form = document.getElementById('bookingForm');
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  const name = form.name.value.trim();
+  const phone = form.phone.value.trim();
+  const phoneRe = /^[\d\s\+\-\(\)]{10,18}$/;
+  const msgEl = document.getElementById('formMsg');
+  if(name.length < 2){
+    msgEl.textContent = 'Пожалуйста, укажите имя.'; msgEl.className='form-msg is-error'; return;
+  }
+  if(!phoneRe.test(phone)){
+    msgEl.textContent = 'Проверьте номер телефона.'; msgEl.className='form-msg is-error'; return;
+  }
+  msgEl.textContent = 'Спасибо, ' + name + '! Заявка отправлена — мастер свяжется с вами для подтверждения записи.';
+  msgEl.className = 'form-msg is-success';
+  form.reset();
+  dateInput.min = new Date().toISOString().split('T')[0];
+});
+</script>
+</body>
+</html>
