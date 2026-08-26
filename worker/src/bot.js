@@ -4,7 +4,8 @@ import {
 } from './slots.js';
 import {
   getBookingsForDate, getBookedSlotsInRange, createBooking,
-  getAdminChatId, claimAdminChatId, getSession, setSession, clearSession
+  getAdminChatId, claimAdminChatId, getSession, setSession, clearSession,
+  confirmBookingByToken
 } from './db.js';
 import { sendMessage, answerCallbackQuery, inlineKeyboard, escapeHtml } from './telegram.js';
 
@@ -53,6 +54,20 @@ async function startBookFlow(env, chatId) {
 async function handleCommand(env, chatId, text) {
   const [cmd, ...rest] = text.trim().split(/\s+/);
   if (cmd === '/start') {
+    const payload = rest[0];
+    if (payload && payload.startsWith('confirm_')) {
+      const token = payload.slice('confirm_'.length);
+      const result = await confirmBookingByToken(env.DB, token, chatId);
+      if (!result.ok) {
+        await sendMessage(env, chatId, result.reason === 'already_claimed'
+          ? 'Эта ссылка подтверждения уже была использована.'
+          : 'Ссылка недействительна или запись отменена.');
+      } else {
+        await sendMessage(env, chatId,
+          `✅ Запись подтверждена: ${formatDateLabel(result.date)} в ${result.slot_time}. Напомним вам за 2 часа до визита.`);
+      }
+      return;
+    }
     const claimed = await claimAdminChatId(env.DB, chatId);
     if (claimed) {
       await sendMessage(env, chatId, `Готово, бот подключён к вам.\n\n${HELP_TEXT}`);
@@ -117,8 +132,11 @@ async function handleSessionText(env, chatId, session, text) {
       await sendMessage(env, chatId, 'Этот слот уже заняли, начните заново: /book');
       return;
     }
+    const confirmLine = env.BOT_USERNAME
+      ? `\n\nЕсли хотите, чтобы я напомнил клиенту за 2 часа до визита, перешлите ему эту ссылку: https://t.me/${env.BOT_USERNAME}?start=confirm_${result.confirmToken}`
+      : '';
     await sendMessage(env, chatId,
-      `✅ Запись создана: ${escapeHtml(draft.client_name)}, ${escapeHtml(draft.client_phone)}, ${escapeHtml(draft.service)} — ${formatDateLabel(draft.date)} ${draft.slot_time}`);
+      `✅ Запись создана: ${escapeHtml(draft.client_name)}, ${escapeHtml(draft.client_phone)}, ${escapeHtml(draft.service)} — ${formatDateLabel(draft.date)} ${draft.slot_time}${confirmLine}`);
   }
 }
 

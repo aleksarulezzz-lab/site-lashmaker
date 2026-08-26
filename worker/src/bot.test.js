@@ -25,8 +25,21 @@ mock.module('./db.js', {
         b => b.status === 'confirmed' && `${b.date}|${b.slot_time}` === key
       );
       if (taken) return { ok: false, reason: 'slot_taken' };
-      dbState.bookings.push({ ...booking, status: 'confirmed' });
-      return { ok: true, id: dbState.bookings.length };
+      const id = dbState.bookings.length + 1;
+      const confirmToken = 'tok' + id;
+      dbState.bookings.push({ ...booking, id, status: 'confirmed', confirm_token: confirmToken, client_chat_id: null });
+      return { ok: true, id, confirmToken };
+    },
+    confirmBookingByToken: async (db, token, chatId) => {
+      const b = dbState.bookings.find(x => x.confirm_token === token && x.status === 'confirmed');
+      if (!b) return { ok: false, reason: 'not_found' };
+      if (b.client_chat_id) {
+        return b.client_chat_id === chatId
+          ? { ok: true, alreadyConfirmed: true, date: b.date, slot_time: b.slot_time }
+          : { ok: false, reason: 'already_claimed' };
+      }
+      b.client_chat_id = chatId;
+      return { ok: true, alreadyConfirmed: false, date: b.date, slot_time: b.slot_time };
     },
     getAdminChatId: async () => dbState.adminChatId,
     claimAdminChatId: async (db, chatId) => {
@@ -111,6 +124,57 @@ test('full /book flow: date -> slot -> name -> phone -> service creates a bot-so
   assert.equal(dbState.bookings[0].client_name, 'Мария');
   assert.equal(dbState.bookings[0].source, 'bot');
   assert.match(sentMessages[sentMessages.length - 1].text, /Запись создана/);
+});
+
+test('/start confirm_<token> claims the booking for the confirming chat', async () => {
+  resetState(); sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: '/start' });
+  dbState.bookings.push({
+    date: '2026-08-31', slot_time: '10:00', client_name: 'Мария', client_phone: '+79990000000',
+    service: 'Классика', status: 'confirmed', confirm_token: 'abc123', client_chat_id: null
+  });
+  sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 999 }, text: '/start confirm_abc123' });
+
+  assert.equal(dbState.bookings[0].client_chat_id, 999);
+  assert.equal(sentMessages[0].chatId, 999);
+  assert.match(sentMessages[0].text, /подтверждена/);
+});
+
+test('/start confirm_<token> with an unknown token replies with an error, not a crash', async () => {
+  resetState(); sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 999 }, text: '/start confirm_doesnotexist' });
+  assert.match(sentMessages[0].text, /недействительна/);
+});
+
+test('a second chat cannot hijack an already-confirmed booking', async () => {
+  resetState(); sentMessages.length = 0;
+  dbState.bookings.push({
+    date: '2026-08-31', slot_time: '10:00', client_name: 'Мария', client_phone: '+79990000000',
+    service: 'Классика', status: 'confirmed', confirm_token: 'abc123', client_chat_id: 999
+  });
+  await handleMessage(env, { chat: { id: 555 }, text: '/start confirm_abc123' });
+
+  assert.equal(dbState.bookings[0].client_chat_id, 999);
+  assert.match(sentMessages[0].text, /уже была использована/);
+});
+
+test('manual /book flow includes a forwardable confirm link when BOT_USERNAME is configured', async () => {
+  resetState(); sentMessages.length = 0;
+  const envWithBot = { DB: {}, BOT_USERNAME: 'test_lash_bot' };
+  await handleMessage(envWithBot, { chat: { id: 111 }, text: '/start' });
+  sentMessages.length = 0;
+
+  await handleMessage(envWithBot, { chat: { id: 111 }, text: '/book' });
+  const dateButtons = sentMessages[sentMessages.length - 1].replyMarkup.inline_keyboard;
+  await handleCallbackQuery(envWithBot, { id: 'cb1', message: { chat: { id: 111 } }, data: dateButtons[0][0].callback_data });
+  const timeButtons = sentMessages[sentMessages.length - 1].replyMarkup.inline_keyboard;
+  await handleCallbackQuery(envWithBot, { id: 'cb2', message: { chat: { id: 111 } }, data: timeButtons[0][0].callback_data });
+  await handleMessage(envWithBot, { chat: { id: 111 }, text: 'Мария' });
+  await handleMessage(envWithBot, { chat: { id: 111 }, text: '+79991112233' });
+  await handleMessage(envWithBot, { chat: { id: 111 }, text: 'Классика' });
+
+  assert.match(sentMessages[sentMessages.length - 1].text, /https:\/\/t\.me\/test_lash_bot\?start=confirm_tok1/);
 });
 
 test('/today escapes HTML in a client name so it cannot inject markup into the Telegram message', async () => {
