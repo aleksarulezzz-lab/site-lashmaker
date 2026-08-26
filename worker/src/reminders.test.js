@@ -5,6 +5,7 @@ import { getTodayMoscow } from './slots.js';
 const sentMessages = [];
 const markedSent = [];
 let candidates = [];
+let failForChatId = null;
 
 mock.module('./db.js', {
   exports: {
@@ -15,7 +16,10 @@ mock.module('./db.js', {
 
 mock.module('./telegram.js', {
   exports: {
-    sendMessage: async (env, chatId, text) => { sentMessages.push({ chatId, text }); },
+    sendMessage: async (env, chatId, text) => {
+      if (chatId === failForChatId) throw new Error('network error');
+      sentMessages.push({ chatId, text });
+    },
     escapeHtml: (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   }
 });
@@ -63,4 +67,26 @@ test('escapes HTML in the service name of the reminder text', async () => {
   await runReminderSweep(env, now);
 
   assert.match(sentMessages[0].text, /&lt;b&gt;hi&lt;\/b&gt;/);
+});
+
+test('one candidate failing to send does not stop reminders for the rest of the batch', async () => {
+  sentMessages.length = 0; markedSent.length = 0;
+  failForChatId = 111;
+  const today = getTodayMoscow();
+  // Same date/slot_time on both rows is unrealistic for real bookings (the DB's
+  // unique index prevents it) but is fine here: this test only exercises the
+  // sweep loop's per-candidate error isolation, not slot uniqueness.
+  const apptMs = Date.parse(`${today}T10:00:00Z`) - 3 * 60 * 60 * 1000;
+  const now = apptMs - 2 * 60 * 60 * 1000;
+  candidates = [
+    { id: 1, date: today, slot_time: '10:00', client_name: 'Сбой', client_phone: '+79990000000', service: 'Классика', client_chat_id: 111 },
+    { id: 2, date: today, slot_time: '10:00', client_name: 'Успех', client_phone: '+79990000001', service: 'Классика', client_chat_id: 222 }
+  ];
+
+  const sent = await runReminderSweep(env, now);
+
+  failForChatId = null;
+  assert.equal(sent, 1);
+  assert.deepEqual(sentMessages.map(m => m.chatId), [222]);
+  assert.deepEqual(markedSent, [2]);
 });
