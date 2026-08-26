@@ -1,0 +1,13 @@
+{
+  "name": "lashmaker-booking-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-test-module-mocks --test src/",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
