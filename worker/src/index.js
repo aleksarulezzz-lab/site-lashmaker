@@ -8,7 +8,11 @@ import { sendEveningStats } from './dailyStats.js';
 
 const EVENING_STATS_CRON = '0 17 * * *';
 
-const ALLOWED_ORIGINS = ['https://aleksarulezzz-lab.github.io'];
+const ALLOWED_ORIGINS = [
+  'https://aleksarulezzz-lab.github.io',
+  'https://aleksarulezzz.ru',
+  'https://www.aleksarulezzz.ru'
+];
 
 function corsHeaders(request) {
   const origin = request.headers.get('Origin');
@@ -18,6 +22,10 @@ function corsHeaders(request) {
   };
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     headers['Access-Control-Allow-Origin'] = origin;
+    // navigator.sendBeacon() (used by the pageview tracker) sends cross-origin
+    // requests with credentials mode 'include' by default; without this the
+    // browser blocks the response even though no cookies are actually used here.
+    headers['Access-Control-Allow-Credentials'] = 'true';
   }
   return headers;
 }
