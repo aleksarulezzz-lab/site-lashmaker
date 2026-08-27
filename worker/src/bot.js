@@ -1,8 +1,8 @@
 import {
   FIXED_SLOTS, isValidDateFormat, getTodayMoscow, getTomorrowMoscow,
-  nextWorkingDays, formatDateLabel, addDays
+  nextWorkingDays, formatDateLabel
 } from './slots.js';
-import { getDailyStats, getRangeStats } from './analytics.js';
+import { buildDailyReport } from './dailyReport.js';
 import {
   getBookingsForDate, getBookedSlotsInRange, createBooking,
   getAdminChatId, claimAdminChatId, getSession, setSession, clearSession,
@@ -54,19 +54,8 @@ async function startBookFlow(env, chatId) {
 }
 
 async function replySiteStats(env, chatId) {
-  const today = getTodayMoscow();
-  const [day, week] = await Promise.all([
-    getDailyStats(env.DB, today),
-    getRangeStats(env.DB, addDays(today, -6), today)
-  ]);
-  const top = week.topPaths.length
-    ? week.topPaths.slice(0, 5).map(p => `  • ${escapeHtml(p.path)} — ${p.views}`).join('\n')
-    : '  (нет данных)';
-  await sendMessage(env, chatId,
-    '📊 Посещаемость сайта\n\n' +
-    `Сегодня: ${day.views} просмотров, ${day.visitors} посетителей\n` +
-    `За 7 дней: ${week.views} просмотров, ${week.visitors} посетителей\n\n` +
-    `Топ страниц за неделю:\n${top}`);
+  const text = await buildDailyReport(env, getTodayMoscow());
+  await sendMessage(env, chatId, text);
 }
 
 async function handleCommand(env, chatId, text) {

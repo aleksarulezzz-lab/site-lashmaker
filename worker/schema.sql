@@ -38,7 +38,11 @@ CREATE TABLE IF NOT EXISTS page_views (
   date TEXT NOT NULL,
   path TEXT NOT NULL,
   visitor_hash TEXT NOT NULL,
+  country TEXT,
+  view_id TEXT,
+  dwell_ms INTEGER,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_page_views_date ON page_views(date);
+CREATE INDEX IF NOT EXISTS idx_page_views_view_id ON page_views(view_id);

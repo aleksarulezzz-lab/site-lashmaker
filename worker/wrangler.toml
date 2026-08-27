@@ -22,3 +22,6 @@ crons = ["*/5 * * * *", "0 17 * * *"]
 # Booking still works with this unset; the confirm link/reminder feature is
 # simply inactive (confirmUrl comes back null) until it's filled in.
 BOT_USERNAME = "Your_lash_maker_bot"
+
+# Public domain, used for the daily report header and the "site is up" ping.
+SITE_DOMAIN = "aleksarulezzz.ru"

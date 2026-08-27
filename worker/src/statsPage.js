@@ -1,4 +1,5 @@
 import { formatDateLabel } from './slots.js';
+import { flagEmoji } from './dailyReport.js';
 
 function esc(value) {
   return String(value)
@@ -9,19 +10,26 @@ function esc(value) {
 }
 
 // Pure: builds the self-contained HTML dashboard served at /api/stats.
-// `todayStats` / `week` / `month` each look like { views, visitors, ... };
-// `week.topPaths` is [{ path, views }]; `byDay` is [{ date, views, visitors }] newest first.
-export function renderStatsPage({ today, todayStats, week, month, byDay }) {
+// `todayStats` / `week` / `month` each look like { views, visitors, avgDwellSec, ... };
+// `week.topPaths` is [{ path, views }]; `byDay` is [{ date, views, visitors }] newest first;
+// `countries` is [{ country, views }] over the last 7 days.
+export function renderStatsPage({ today, todayStats, week, month, byDay, countries }) {
   const card = (title, s) => `
       <div class="card">
         <h2>${esc(title)}</h2>
         <p class="big">${s.views}<span>просмотров</span></p>
         <p class="big">${s.visitors}<span>посетителей</span></p>
+        <p class="small">${s.avgDwellSec || 0} сек на сайте</p>
       </div>`;
 
   const topPaths = (week && week.topPaths) || [];
   const topRows = topPaths.length
     ? topPaths.map(p => `<tr><td>${esc(p.path)}</td><td>${p.views}</td></tr>`).join('')
+    : '<tr><td colspan="2" class="empty">нет данных</td></tr>';
+
+  const cc = countries || [];
+  const countryRows = cc.length
+    ? cc.map(c => `<tr><td>${flagEmoji(c.country)} ${esc(c.country)}</td><td>${c.views}</td></tr>`).join('')
     : '<tr><td colspan="2" class="empty">нет данных</td></tr>';
 
   const days = byDay || [];
@@ -47,6 +55,7 @@ export function renderStatsPage({ today, todayStats, week, month, byDay }) {
   .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#8a7c68;margin:0 0 10px;font-weight:600;}
   .big{font-size:24px;font-weight:700;margin:0 0 2px;display:flex;align-items:baseline;gap:8px;}
   .big span{font-size:12px;font-weight:400;color:#8a7c68;}
+  .small{font-size:12px;color:#8a7c68;margin:6px 0 0;}
   h3{font-size:15px;margin:24px 0 8px;}
   table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e8dfd0;border-radius:12px;overflow:hidden;}
   th,td{text-align:left;padding:9px 14px;border-bottom:1px solid #efe7d9;font-size:14px;word-break:break-all;}
@@ -73,9 +82,11 @@ export function renderStatsPage({ today, todayStats, week, month, byDay }) {
   </div>
   <h3>Топ страниц за 7 дней</h3>
   <table><thead><tr><th>Страница</th><th>Просмотры</th></tr></thead><tbody>${topRows}</tbody></table>
+  <h3>Откуда приходят (7 дней)</h3>
+  <table><thead><tr><th>Страна</th><th>Просмотры</th></tr></thead><tbody>${countryRows}</tbody></table>
   <h3>По дням (2 недели)</h3>
   <table><thead><tr><th>День</th><th>Просмотры</th><th>Посетители</th></tr></thead><tbody>${dayRows}</tbody></table>
-  <p class="foot">Данные обезличены: вместо IP хранится дневной хэш, между днями посетитель не отслеживается.</p>
+  <p class="foot">Данные обезличены: вместо IP хранится дневной хэш, между днями посетитель не отслеживается. Среднее время — приблизительное (сигнал при уходе доходит не всегда).</p>
 </body>
 </html>`;
 }

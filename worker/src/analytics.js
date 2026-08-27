@@ -4,15 +4,30 @@ export async function hashVisitor(ip, userAgent, date) {
   return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function recordPageView(db, { date, path, visitorHash }) {
+export async function recordPageView(db, { date, path, visitorHash, viewId = null, country = null }) {
   await db.prepare(
-    `INSERT INTO page_views (date, path, visitor_hash) VALUES (?, ?, ?)`
-  ).bind(date, path, visitorHash).run();
+    `INSERT INTO page_views (date, path, visitor_hash, view_id, country) VALUES (?, ?, ?, ?, ?)`
+  ).bind(date, path, visitorHash, viewId, country).run();
+}
+
+// Follow-up "page unload" beacon: record how long the visit lasted. Matches the
+// row the load beacon created by its client-generated view_id, and only fills
+// dwell_ms while it is still NULL so a late/duplicate call can't overwrite it.
+export async function recordDwell(db, { viewId, dwellMs }) {
+  await db.prepare(
+    `UPDATE page_views SET dwell_ms = ? WHERE view_id = ? AND dwell_ms IS NULL`
+  ).bind(dwellMs, viewId).run();
+}
+
+function secondsFromAvg(avgMs) {
+  return avgMs ? Math.round(avgMs / 1000) : 0;
 }
 
 export async function getDailyStats(db, date) {
   const totals = await db.prepare(
-    `SELECT COUNT(*) as views, COUNT(DISTINCT visitor_hash) as visitors
+    `SELECT COUNT(*) as views,
+            COUNT(DISTINCT visitor_hash) as visitors,
+            AVG(dwell_ms) as avg_dwell_ms
      FROM page_views WHERE date = ?`
   ).bind(date).first();
   const { results: topPaths } = await db.prepare(
@@ -22,7 +37,8 @@ export async function getDailyStats(db, date) {
   return {
     views: totals?.views || 0,
     visitors: totals?.visitors || 0,
-    topPaths
+    avgDwellSec: secondsFromAvg(totals?.avg_dwell_ms),
+    topPaths: topPaths || []
   };
 }
 
@@ -30,7 +46,9 @@ export async function getDailyStats(db, date) {
 // Returns overall totals, the busiest pages, and a per-day breakdown (newest first).
 export async function getRangeStats(db, fromDate, toDate) {
   const totals = await db.prepare(
-    `SELECT COUNT(*) as views, COUNT(DISTINCT visitor_hash) as visitors
+    `SELECT COUNT(*) as views,
+            COUNT(DISTINCT visitor_hash) as visitors,
+            AVG(dwell_ms) as avg_dwell_ms
      FROM page_views WHERE date >= ? AND date <= ?`
   ).bind(fromDate, toDate).first();
   const { results: topPaths } = await db.prepare(
@@ -44,7 +62,23 @@ export async function getRangeStats(db, fromDate, toDate) {
   return {
     views: totals?.views || 0,
     visitors: totals?.visitors || 0,
+    avgDwellSec: secondsFromAvg(totals?.avg_dwell_ms),
     topPaths: topPaths || [],
     byDay: byDay || []
   };
+}
+
+// Visits grouped by country over an inclusive range, busiest first. 'XX'
+// (unknown) and 'T1' (Tor) are Cloudflare placeholders and are dropped.
+export async function getRangeCountries(db, fromDate, toDate, limit = 6) {
+  const { results } = await db.prepare(
+    `SELECT country, COUNT(*) as views FROM page_views
+     WHERE date >= ? AND date <= ? AND country IS NOT NULL AND country NOT IN ('', 'XX', 'T1')
+     GROUP BY country ORDER BY views DESC LIMIT ?`
+  ).bind(fromDate, toDate, limit).all();
+  return results || [];
+}
+
+export function getDailyCountries(db, date, limit = 6) {
+  return getRangeCountries(db, date, date, limit);
 }

@@ -3,7 +3,7 @@ import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
 import { runReminderSweep } from './reminders.js';
-import { hashVisitor, recordPageView, getDailyStats, getRangeStats } from './analytics.js';
+import { hashVisitor, recordPageView, recordDwell, getDailyStats, getRangeStats, getRangeCountries } from './analytics.js';
 import { renderStatsPage } from './statsPage.js';
 import { sendEveningStats } from './dailyStats.js';
 
@@ -120,7 +120,8 @@ async function checkRateLimit(env, key, limit) {
 
 async function handleTrack(request, env, cors) {
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  if (env.RATE_LIMIT && !(await checkRateLimit(env, `track:${ip}`, 30))) {
+  // 60/10min: each pageview now makes up to two calls (load + unload beacon).
+  if (env.RATE_LIMIT && !(await checkRateLimit(env, `track:${ip}`, 60))) {
     return new Response(null, { status: 204, headers: cors });
   }
   let body;
@@ -129,11 +130,21 @@ async function handleTrack(request, env, cors) {
   } catch {
     return new Response(null, { status: 204, headers: cors });
   }
+  const viewId = typeof body?.viewId === 'string' && body.viewId ? body.viewId.slice(0, 64) : null;
+
+  // Follow-up beacon fired when the visitor leaves the page.
+  if (viewId && Number.isFinite(body?.dwellMs)) {
+    const dwellMs = Math.min(Math.max(Math.round(body.dwellMs), 0), 30 * 60 * 1000);
+    await recordDwell(env.DB, { viewId, dwellMs });
+    return new Response(null, { status: 204, headers: cors });
+  }
+
   const path = typeof body?.path === 'string' && body.path ? body.path.slice(0, 200) : '/';
   const ua = request.headers.get('User-Agent') || 'unknown';
+  const country = request.headers.get('CF-IPCountry') || null;
   const date = getTodayMoscow();
   const visitorHash = await hashVisitor(ip, ua, date);
-  await recordPageView(env.DB, { date, path, visitorHash });
+  await recordPageView(env.DB, { date, path, visitorHash, viewId, country });
   return new Response(null, { status: 204, headers: cors });
 }
 
@@ -144,13 +155,14 @@ async function handleStats(request, env) {
     return new Response('Unauthorized', { status: 401 });
   }
   const today = getTodayMoscow();
-  const [todayStats, week, twoWeeks, month] = await Promise.all([
+  const [todayStats, week, twoWeeks, month, countries] = await Promise.all([
     getDailyStats(env.DB, today),
     getRangeStats(env.DB, addDays(today, -6), today),
     getRangeStats(env.DB, addDays(today, -13), today),
-    getRangeStats(env.DB, addDays(today, -29), today)
+    getRangeStats(env.DB, addDays(today, -29), today),
+    getRangeCountries(env.DB, addDays(today, -6), today, 8)
   ]);
-  const html = renderStatsPage({ today, todayStats, week, month, byDay: twoWeeks.byDay });
+  const html = renderStatsPage({ today, todayStats, week, month, byDay: twoWeeks.byDay, countries });
   return new Response(html, {
     status: 200,
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
