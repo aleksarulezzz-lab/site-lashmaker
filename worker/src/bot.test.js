@@ -61,6 +61,17 @@ mock.module('./telegram.js', {
   }
 });
 
+let siteStats = {
+  day: { views: 0, visitors: 0, topPaths: [] },
+  week: { views: 0, visitors: 0, topPaths: [], byDay: [] }
+};
+mock.module('./analytics.js', {
+  exports: {
+    getDailyStats: async () => siteStats.day,
+    getRangeStats: async () => siteStats.week
+  }
+});
+
 const { handleMessage, handleCallbackQuery } = await import('./bot.js');
 const env = { DB: {} };
 
@@ -225,4 +236,32 @@ test('an interrupting command clears a mid-flow /book session so later free text
   assert.equal(dbState.bookings.length, 0);
   assert.equal(dbState.sessions.has(111), false);
   assert.match(sentMessages[sentMessages.length - 1].text, /умею/);
+});
+
+test('/stats replies to the admin with site visit numbers and weekly top pages', async () => {
+  resetState(); sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: '/start' });
+  sentMessages.length = 0;
+  siteStats = {
+    day: { views: 6, visitors: 3, topPaths: [] },
+    week: { views: 40, visitors: 21, topPaths: [{ path: '/lashmaker/variant-12-baroque-silk-drape.html', views: 28 }], byDay: [] }
+  };
+
+  await handleMessage(env, { chat: { id: 111 }, text: '/stats' });
+
+  assert.equal(sentMessages.length, 1);
+  assert.equal(sentMessages[0].chatId, 111);
+  assert.match(sentMessages[0].text, /Сегодня: 6 просмотров, 3 посетител/);
+  assert.match(sentMessages[0].text, /За 7 дней: 40 просмотров, 21 посетител/);
+  assert.match(sentMessages[0].text, /variant-12-baroque-silk-drape\.html — 28/);
+});
+
+test('/stats is refused for a non-admin chat', async () => {
+  resetState(); sentMessages.length = 0;
+  await handleMessage(env, { chat: { id: 111 }, text: '/start' });
+  sentMessages.length = 0;
+
+  await handleMessage(env, { chat: { id: 999 }, text: '/stats' });
+
+  assert.match(sentMessages[0].text, /приватный/);
 });

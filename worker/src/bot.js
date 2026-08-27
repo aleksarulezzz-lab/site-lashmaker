@@ -1,7 +1,8 @@
 import {
   FIXED_SLOTS, isValidDateFormat, getTodayMoscow, getTomorrowMoscow,
-  nextWorkingDays, formatDateLabel
+  nextWorkingDays, formatDateLabel, addDays
 } from './slots.js';
+import { getDailyStats, getRangeStats } from './analytics.js';
 import {
   getBookingsForDate, getBookedSlotsInRange, createBooking,
   getAdminChatId, claimAdminChatId, getSession, setSession, clearSession,
@@ -14,7 +15,8 @@ const HELP_TEXT = [
   '/today — записи на сегодня',
   '/tomorrow — записи на завтра',
   '/date ГГГГ-ММ-ДД — записи на любую дату',
-  '/book — создать новую запись вручную'
+  '/book — создать новую запись вручную',
+  '/stats — посещаемость сайта'
 ].join('\n');
 
 const PHONE_RE = /^[\d\s\+\-\(\)]{10,18}$/;
@@ -49,6 +51,22 @@ async function startBookFlow(env, chatId) {
   const rows = withFreeSlot.map(date => ([{ text: formatDateLabel(date), callback_data: `bd:${date}` }]));
   await setSession(env.DB, chatId, 'await_date', {});
   await sendMessage(env, chatId, 'Выберите дату записи:', inlineKeyboard(rows));
+}
+
+async function replySiteStats(env, chatId) {
+  const today = getTodayMoscow();
+  const [day, week] = await Promise.all([
+    getDailyStats(env.DB, today),
+    getRangeStats(env.DB, addDays(today, -6), today)
+  ]);
+  const top = week.topPaths.length
+    ? week.topPaths.slice(0, 5).map(p => `  • ${escapeHtml(p.path)} — ${p.views}`).join('\n')
+    : '  (нет данных)';
+  await sendMessage(env, chatId,
+    '📊 Посещаемость сайта\n\n' +
+    `Сегодня: ${day.views} просмотров, ${day.visitors} посетителей\n` +
+    `За 7 дней: ${week.views} просмотров, ${week.visitors} посетителей\n\n` +
+    `Топ страниц за неделю:\n${top}`);
 }
 
 async function handleCommand(env, chatId, text) {
@@ -95,6 +113,8 @@ async function handleCommand(env, chatId, text) {
     await replyBookingsForDate(env, chatId, dateStr);
   } else if (cmd === '/book') {
     await startBookFlow(env, chatId);
+  } else if (cmd === '/stats') {
+    await replySiteStats(env, chatId);
   } else {
     await sendMessage(env, chatId, HELP_TEXT);
   }

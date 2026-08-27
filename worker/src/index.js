@@ -1,9 +1,10 @@
-import { isValidDateFormat, isValidSlotTime, isWorkingDay, getTodayMoscow, FIXED_SLOTS } from './slots.js';
+import { isValidDateFormat, isValidSlotTime, isWorkingDay, getTodayMoscow, addDays, FIXED_SLOTS } from './slots.js';
 import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
 import { runReminderSweep } from './reminders.js';
-import { hashVisitor, recordPageView } from './analytics.js';
+import { hashVisitor, recordPageView, getDailyStats, getRangeStats } from './analytics.js';
+import { renderStatsPage } from './statsPage.js';
 import { sendEveningStats } from './dailyStats.js';
 
 const EVENING_STATS_CRON = '0 17 * * *';
@@ -136,6 +137,26 @@ async function handleTrack(request, env, cors) {
   return new Response(null, { status: 204, headers: cors });
 }
 
+async function handleStats(request, env) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get('token');
+  if (!env.STATS_TOKEN || token !== env.STATS_TOKEN) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  const today = getTodayMoscow();
+  const [todayStats, week, twoWeeks, month] = await Promise.all([
+    getDailyStats(env.DB, today),
+    getRangeStats(env.DB, addDays(today, -6), today),
+    getRangeStats(env.DB, addDays(today, -13), today),
+    getRangeStats(env.DB, addDays(today, -29), today)
+  ]);
+  const html = renderStatsPage({ today, todayStats, week, month, byDay: twoWeeks.byDay });
+  return new Response(html, {
+    status: 200,
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
+  });
+}
+
 async function handleTelegramWebhook(request, env) {
   const secret = request.headers.get('X-Telegram-Bot-Api-Secret-Token');
   if (secret !== env.WEBHOOK_SECRET) {
@@ -166,6 +187,9 @@ export default {
     }
     if (url.pathname === '/api/track' && request.method === 'POST') {
       return handleTrack(request, env, cors);
+    }
+    if (url.pathname === '/api/stats' && request.method === 'GET') {
+      return handleStats(request, env);
     }
     if (url.pathname === '/telegram-webhook' && request.method === 'POST') {
       return handleTelegramWebhook(request, env);
