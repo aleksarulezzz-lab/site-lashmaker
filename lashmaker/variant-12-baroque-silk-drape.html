@@ -10,7 +10,7 @@
 <meta name="description" content="Александра Рулева — наращивание и ламинирование ресниц. Барочная роскошь в каждой детали.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,800&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Manrope:wght@300;400;600;700;800&family=Prata&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,800&family=Cormorant+Garamond:ital,wght@0,500;1,300;1,500&family=Manrope:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0c0806;
@@ -129,7 +129,7 @@
   .shimmer-fill{
     background:linear-gradient(115deg,#c9a24a 0%,#e8c876 16%,#f6dfa0 38%,#fff8e4 50%,#f6dfa0 62%,#e8c876 84%,#c9a24a 100%);
     background-size:260% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
-    text-shadow:0 2px 1px rgba(0,0,0,.5);
+    text-shadow:0 1px 1px rgba(0,0,0,.38);
     display:inline-block;
     animation:shimmer 5.5s cubic-bezier(.37,0,.63,1) infinite;
   }
@@ -253,10 +253,10 @@
   .hero-sparkle{position:absolute;width:5px;height:5px;background:#fff2d4;border-radius:50%;box-shadow:0 0 9px 3px rgba(232,200,118,.9);animation:heroSparkle 3.2s ease-in-out infinite;pointer-events:none;}
   @keyframes heroSparkle{0%,100%{opacity:0;transform:scale(.4);}50%{opacity:1;transform:scale(1);}}
   .hero-portrait-mobile{display:none;}
-  /* opacity-only entrance (no transform) — Safari can leave large high-contrast display glyphs
+  /* opacity-only entrance (no transform) — Safari can leave large decorative-italic glyphs
      looking softly clipped at their tips after a transform-based animation settles on an element
      that also uses -webkit-background-clip:text; removing the transform removes that risk here. */
-  .hero h1{font-size:clamp(48px,7vw,92px);font-weight:400;font-family:'Prata',serif;line-height:1.15;letter-spacing:.04em;text-transform:uppercase;opacity:0;animation:fadeIn .9s ease forwards .25s;}
+  .hero h1{font-size:clamp(52px,8vw,104px);font-weight:300;font-style:italic;font-family:var(--font-script);line-height:1.15;opacity:0;animation:fadeIn .9s ease forwards .25s;}
   @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
   .hero p.lead{font-size:22px;line-height:1.55;color:var(--ink-soft);max-width:520px;margin:22px 0 0;font-family:var(--font-script);opacity:0;animation:fadeUp .8s ease forwards .45s;}
   .hero-cta{display:flex;gap:16px;margin-top:36px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s ease forwards .6s;}
