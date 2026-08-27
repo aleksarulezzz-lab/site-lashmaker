@@ -40,7 +40,7 @@ export function shortPath(path) {
 async function pingSite(url) {
   const started = Date.now();
   try {
-    const res = await fetch(url, { method: 'GET' });
+    const res = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(5000) });
     return { ok: res.status >= 200 && res.status < 400, ms: Date.now() - started };
   } catch {
     return { ok: false, ms: Date.now() - started };

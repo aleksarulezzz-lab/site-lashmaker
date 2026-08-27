@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hashVisitor, getRangeStats, getRangeCountries } from './analytics.js';
+import { hashVisitor, getRangeStats, getRangeCountries, prunePageViews } from './analytics.js';
 
 // Minimal in-memory stand-in for a D1 prepared statement, enough to exercise
 // the queries getRangeStats / getRangeCountries run.
@@ -12,6 +12,17 @@ function fakeDb(rows) {
         sql,
         args: [],
         bind(...args) { stmt.args = args; return stmt; },
+        async run() {
+          if (/^DELETE FROM page_views WHERE date < /.test(sql)) {
+            const [cutoff] = stmt.args;
+            const before = rows.length;
+            for (let i = rows.length - 1; i >= 0; i--) {
+              if (rows[i].date < cutoff) rows.splice(i, 1);
+            }
+            return { meta: { changes: before - rows.length } };
+          }
+          return { meta: { changes: 0 } };
+        },
         async first() {
           const [from, to] = stmt.args;
           const inRange = rows.filter(r => r.date >= from && r.date <= to);
@@ -126,4 +137,13 @@ test('getRangeCountries ranks countries and drops the XX / T1 placeholders', asy
     { country: 'RU', views: 3 },
     { country: 'KZ', views: 1 }
   ]);
+});
+
+test('prunePageViews deletes only rows older than the cutoff and reports the count', async () => {
+  const rows = [...RANGE_ROWS];
+  const db = fakeDb(rows);
+  const deleted = await prunePageViews(db, '2026-08-25');
+  assert.equal(deleted, 1); // only the 2026-08-20 row is older
+  assert.equal(rows.some(r => r.date === '2026-08-20'), false);
+  assert.equal(rows.length, RANGE_ROWS.length - 1);
 });

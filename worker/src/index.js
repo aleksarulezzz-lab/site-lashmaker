@@ -3,17 +3,15 @@ import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
 import { runReminderSweep } from './reminders.js';
-import { hashVisitor, recordPageView, recordDwell, getDailyStats, getRangeStats, getRangeCountries } from './analytics.js';
+import { hashVisitor, recordPageView, recordDwell, prunePageViews, getDailyStats, getRangeStats, getRangeCountries } from './analytics.js';
 import { renderStatsPage } from './statsPage.js';
 import { sendEveningStats } from './dailyStats.js';
+import { ALLOWED_ORIGINS, timingSafeEqual, beaconSourceAllowed } from './httpGuards.js';
 
 const EVENING_STATS_CRON = '0 17 * * *';
-
-const ALLOWED_ORIGINS = [
-  'https://aleksarulezzz-lab.github.io',
-  'https://aleksarulezzz.ru',
-  'https://www.aleksarulezzz.ru'
-];
+const MAX_AVAILABILITY_DAYS = 62;   // widest date range /api/availability will serve
+const MAX_BOOKING_AHEAD_DAYS = 90;  // furthest ahead a public booking may be made
+const PAGEVIEW_RETENTION_DAYS = 180;
 
 function corsHeaders(request) {
   const origin = request.headers.get('Origin');
@@ -44,6 +42,10 @@ async function handleAvailability(request, env, cors) {
   const to = url.searchParams.get('to');
   if (!isValidDateFormat(from) || !isValidDateFormat(to) || from > to) {
     return json({ error: 'invalid_range' }, 400, cors);
+  }
+  const spanDays = Math.round((Date.parse(to + 'T00:00:00Z') - Date.parse(from + 'T00:00:00Z')) / 86400000);
+  if (spanDays > MAX_AVAILABILITY_DAYS) {
+    return json({ error: 'range_too_large' }, 400, cors);
   }
   const booked = await getBookedSlotsInRange(env.DB, from, to);
   const days = [];
@@ -79,6 +81,9 @@ async function handleBook(request, env, cors) {
   if (!isValidDateFormat(date) || !isWorkingDay(date) || date < getTodayMoscow()) {
     return json({ error: 'invalid_date' }, 400, cors);
   }
+  if (date > addDays(getTodayMoscow(), MAX_BOOKING_AHEAD_DAYS)) {
+    return json({ error: 'too_far_ahead' }, 400, cors);
+  }
   if (!isValidSlotTime(slot_time)) {
     return json({ error: 'invalid_slot' }, 400, cors);
   }
@@ -111,47 +116,58 @@ async function handleBook(request, env, cors) {
 }
 
 async function checkRateLimit(env, key, limit) {
-  const current = await env.RATE_LIMIT.get(key);
-  const count = current ? parseInt(current, 10) : 0;
+  const parsed = parseInt(await env.RATE_LIMIT.get(key), 10);
+  const count = Number.isNaN(parsed) ? 0 : parsed;
   if (count >= limit) return false;
   await env.RATE_LIMIT.put(key, String(count + 1), { expirationTtl: 600 });
   return true;
 }
 
 async function handleTrack(request, env, cors) {
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  // 60/10min: each pageview now makes up to two calls (load + unload beacon).
-  if (env.RATE_LIMIT && !(await checkRateLimit(env, `track:${ip}`, 60))) {
-    return new Response(null, { status: 204, headers: cors });
+  const noContent = () => new Response(null, { status: 204, headers: cors });
+
+  // Only accept beacons that actually came from one of our pages.
+  if (!beaconSourceAllowed(request.headers.get('Origin'), request.headers.get('Referer'))) {
+    return noContent();
   }
+
   let body;
   try {
     body = await request.json();
   } catch {
-    return new Response(null, { status: 204, headers: cors });
+    return noContent();
   }
   const viewId = typeof body?.viewId === 'string' && body.viewId ? body.viewId.slice(0, 64) : null;
 
-  // Follow-up beacon fired when the visitor leaves the page.
-  if (viewId && Number.isFinite(body?.dwellMs)) {
-    const dwellMs = Math.min(Math.max(Math.round(body.dwellMs), 0), 30 * 60 * 1000);
-    await recordDwell(env.DB, { viewId, dwellMs });
-    return new Response(null, { status: 204, headers: cors });
+  // Follow-up beacon fired when the visitor leaves the page. Not rate-limited:
+  // it can only UPDATE a row an earlier (rate-limited) load beacon created.
+  const dwellMs = Number(body?.dwellMs);
+  if (viewId && Number.isFinite(dwellMs)) {
+    await recordDwell(env.DB, { viewId, dwellMs: Math.min(Math.max(Math.round(dwellMs), 0), 30 * 60 * 1000) });
+    return noContent();
   }
 
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (env.RATE_LIMIT && !(await checkRateLimit(env, `track:${ip}`, 40))) {
+    return noContent();
+  }
   const path = typeof body?.path === 'string' && body.path ? body.path.slice(0, 200) : '/';
   const ua = request.headers.get('User-Agent') || 'unknown';
   const country = request.headers.get('CF-IPCountry') || null;
   const date = getTodayMoscow();
   const visitorHash = await hashVisitor(ip, ua, date);
   await recordPageView(env.DB, { date, path, visitorHash, viewId, country });
-  return new Response(null, { status: 204, headers: cors });
+  return noContent();
 }
 
 async function handleStats(request, env) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (env.RATE_LIMIT && !(await checkRateLimit(env, `stats:${ip}`, 20))) {
+    return new Response('Too Many Requests', { status: 429 });
+  }
   const url = new URL(request.url);
   const token = url.searchParams.get('token');
-  if (!env.STATS_TOKEN || token !== env.STATS_TOKEN) {
+  if (!env.STATS_TOKEN || !(await timingSafeEqual(token, env.STATS_TOKEN))) {
     return new Response('Unauthorized', { status: 401 });
   }
   const today = getTodayMoscow();
@@ -171,7 +187,7 @@ async function handleStats(request, env) {
 
 async function handleTelegramWebhook(request, env) {
   const secret = request.headers.get('X-Telegram-Bot-Api-Secret-Token');
-  if (secret !== env.WEBHOOK_SECRET) {
+  if (!env.WEBHOOK_SECRET || !(await timingSafeEqual(secret, env.WEBHOOK_SECRET))) {
     return new Response('forbidden', { status: 403 });
   }
   let update;
@@ -212,6 +228,7 @@ export default {
   async scheduled(event, env, ctx) {
     if (event.cron === EVENING_STATS_CRON) {
       ctx.waitUntil(sendEveningStats(env));
+      ctx.waitUntil(prunePageViews(env.DB, addDays(getTodayMoscow(), -PAGEVIEW_RETENTION_DAYS)));
     } else {
       ctx.waitUntil(runReminderSweep(env));
     }

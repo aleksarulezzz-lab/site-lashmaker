@@ -82,3 +82,12 @@ export async function getRangeCountries(db, fromDate, toDate, limit = 6) {
 export function getDailyCountries(db, date, limit = 6) {
   return getRangeCountries(db, date, date, limit);
 }
+
+// Retention: drop pageview rows older than the cutoff so a flood (or just time)
+// can't grow the table without bound. Called from the daily cron.
+export async function prunePageViews(db, cutoffDate) {
+  const res = await db.prepare(
+    `DELETE FROM page_views WHERE date < ?`
+  ).bind(cutoffDate).run();
+  return res?.meta?.changes ?? 0;
+}

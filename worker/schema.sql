@@ -46,3 +46,10 @@ CREATE TABLE IF NOT EXISTS page_views (
 
 CREATE INDEX IF NOT EXISTS idx_page_views_date ON page_views(date);
 CREATE INDEX IF NOT EXISTS idx_page_views_view_id ON page_views(view_id);
+
+-- Records which migration-*.sql files have been applied to this database.
+-- Each migration file ends with an INSERT of its own name here.
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  name TEXT PRIMARY KEY,
+  applied_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
