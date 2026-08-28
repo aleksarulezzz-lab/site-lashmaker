@@ -312,7 +312,7 @@
   }
   @keyframes portraitGlow{0%,100%{opacity:.65;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06);}}
   .hero-portrait{position:relative;width:100%;height:100%;}
-  .hero-portrait img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:drop-shadow(0 44px 70px rgba(0,0,0,.55)) saturate(1.04) contrast(1.04) brightness(1.02);-webkit-mask-image:linear-gradient(to bottom,#000 84%,transparent 100%);mask-image:linear-gradient(to bottom,#000 84%,transparent 100%);transform:scaleX(-1);}
+  .hero-portrait img{width:100%;height:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 40px 60px rgba(0,0,0,.5)) saturate(1.04) contrast(1.04) brightness(1.02);-webkit-mask-image:linear-gradient(to bottom,#000 94%,transparent 100%);mask-image:linear-gradient(to bottom,#000 94%,transparent 100%);transform:scaleX(-1);}
   .hero-sparkle{position:absolute;width:5px;height:5px;background:#fff2d4;border-radius:50%;box-shadow:0 0 9px 3px rgba(232,200,118,.9);animation:heroSparkle 3.2s ease-in-out infinite;pointer-events:none;}
   @keyframes heroSparkle{0%,100%{opacity:0;transform:scale(.4);}50%{opacity:1;transform:scale(1);}}
   .hero-portrait-mobile{display:none;}
@@ -647,7 +647,7 @@
   <div class="hero-fabric" aria-hidden="true"></div>
   <div class="container hero-inner">
     <div class="hero-text">
-      <div class="hero-portrait-mobile" aria-hidden="true"><img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="980" height="1179" decoding="async" fetchpriority="high" loading="eager"></div>
+      <div class="hero-portrait-mobile" aria-hidden="true"><img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="1000" height="1341" decoding="async" fetchpriority="high" loading="eager"></div>
       <span class="eyebrow">Наращивание · Ламинирование ресниц</span>
       <h1><span class="shimmer-fill">Александра Рулева</span></h1>
       <p class="lead">Мастер по наращиванию и ламинированию ресниц. Барочная роскошь и внимание к каждой детали ради взгляда, достойного восхищения.</p>
@@ -662,7 +662,7 @@
       </div>
     </div>
     <div class="hero-portrait-frame" aria-hidden="true">
-      <div class="hero-portrait"><img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="980" height="1179" decoding="async" fetchpriority="high" loading="eager"></div>
+      <div class="hero-portrait"><img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="1000" height="1341" decoding="async" fetchpriority="high" loading="eager"></div>
     </div>
   </div>
   <div class="scroll-cue" aria-hidden="true"><span>Листайте</span><div class="scroll-tick"></div></div>
@@ -926,7 +926,11 @@
   <div class="container">
     <div style="max-width:640px;margin:0 auto 20px;text-align:left;line-height:1.7;font-size:13.5px;">
       <b style="display:block;font-family:var(--font-head);font-size:15px;margin-bottom:8px;color:var(--accent);">Это демонстрационный проект</b>
-      Я не мастер по наращиванию ресниц. Меня зовут <b>Александра Рулева</b>, я специалист по AI-автоматизации бизнес-процессов. Всё на этой странице работает по-настоящему: онлайн-запись, Telegram-бот с подтверждением и напоминаниями за 2 часа, сбор аналитики посещений. Нужен такой сайт под вашу задачу? Напишите:
+      Я не мастер по наращиванию ресниц. Меня зовут <b>Александра Рулева</b>, я специалист по AI-автоматизации бизнес-процессов. Всё на этой странице работает по-настоящему: онлайн-запись, Telegram-бот с подтверждением и напоминаниями за 2 часа, сбор аналитики посещений.
+      <br><br>
+      Отдельная сила этого сайта в том, что он помогает клиенту определиться ещё до записи: тест на подбор эффекта, примерочная по своему фото, наглядные виды изгибов с эффектом «до и после» и памятка по уходу. Клиент приходит с понятным ожиданием, а мастер заранее знает, что готовить. Для вашего проекта я так же продумаю акценты, которые будут полезны именно вашей аудитории.
+      <br><br>
+      Нужен такой сайт под вашу задачу? Напишите:
     </div>
     <nav style="display:flex;flex-wrap:wrap;gap:10px 12px;justify-content:center;margin-bottom:22px;" aria-label="Контакты Александры Рулевой">
       <a href="https://t.me/zapuskator_A" target="_blank" rel="me noopener" data-umami-event="contact_click" data-umami-event-channel="telegram" style="color:var(--accent);text-decoration:none;border:1px solid var(--border);padding:8px 15px;border-radius:999px;font-weight:700;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;">Telegram</a>
@@ -943,4 +947,3 @@
 <script src="assets/site.js?v=3" defer></script>
 </body>
 </html>
-                                                                                                                                                                                                                                    
