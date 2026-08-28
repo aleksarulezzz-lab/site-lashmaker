@@ -156,7 +156,8 @@
         slot_time: state.selectedTime,
         client_name: name,
         client_phone: phone,
-        service: service
+        service: service,
+        hp: (form.hp && form.hp.value) || ''
       })
     }).then(function(res){
       if(res.status === 409){ throw new Error('slot_taken'); }

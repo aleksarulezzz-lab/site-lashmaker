@@ -72,6 +72,13 @@ export async function markReminderSent(db, id) {
   await db.prepare(`UPDATE bookings SET reminder_sent = 1 WHERE id = ?`).bind(id).run();
 }
 
+// Retention: drop bookings whose date is older than the cutoff. This is a
+// demo site — client name + phone shouldn't sit in the DB indefinitely.
+export async function deleteBookingsBefore(db, dateStr) {
+  const res = await db.prepare(`DELETE FROM bookings WHERE date < ?`).bind(dateStr).run();
+  return res?.meta?.changes ?? 0;
+}
+
 export async function getAdminChatId(db) {
   const row = await db.prepare(`SELECT value FROM config WHERE key = 'admin_chat_id'`).first();
   return row ? row.value : null;

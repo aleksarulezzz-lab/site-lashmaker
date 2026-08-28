@@ -1,5 +1,5 @@
 import { isValidDateFormat, isValidSlotTime, isWorkingDay, getTodayMoscow, addDays, FIXED_SLOTS } from './slots.js';
-import { getBookedSlotsInRange, createBooking, getAdminChatId } from './db.js';
+import { getBookedSlotsInRange, createBooking, getAdminChatId, deleteBookingsBefore } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
 import { runReminderSweep } from './reminders.js';
@@ -12,6 +12,21 @@ const EVENING_STATS_CRON = '0 17 * * *';
 const MAX_AVAILABILITY_DAYS = 62;   // widest date range /api/availability will serve
 const MAX_BOOKING_AHEAD_DAYS = 90;  // furthest ahead a public booking may be made
 const PAGEVIEW_RETENTION_DAYS = 180;
+const BOOKING_RETENTION_DAYS = 90;
+
+// Background tasks run detached via ctx.waitUntil, so a failure would otherwise
+// be silent. Wrap each one: on error, ping the admin in Telegram.
+function guardCron(env, label, task) {
+  return Promise.resolve(task).catch(async (err) => {
+    try {
+      const adminChatId = await getAdminChatId(env.DB);
+      if (adminChatId) {
+        await sendMessage(env, adminChatId,
+          `⚠️ Сбой в фоновой задаче «${label}»:\n${escapeHtml(String((err && err.message) || err)).slice(0, 500)}`);
+      }
+    } catch { /* alerting itself failed — nothing more we can do */ }
+  });
+}
 
 function corsHeaders(request) {
   const origin = request.headers.get('Origin');
@@ -76,6 +91,11 @@ async function handleBook(request, env, cors) {
     body = await request.json();
   } catch {
     return json({ error: 'invalid_json' }, 400, cors);
+  }
+  // Honeypot: real users never see or fill the hidden "hp" field.
+  // Pretend it worked so a bot gets no signal, but create nothing.
+  if (typeof body?.hp === 'string' && body.hp.trim() !== '') {
+    return json({ ok: true, id: 0, confirmUrl: null }, 200, cors);
   }
   const { date, slot_time, client_name, client_phone, service } = body || {};
   if (!isValidDateFormat(date) || !isWorkingDay(date) || date < getTodayMoscow()) {
@@ -227,10 +247,11 @@ export default {
 
   async scheduled(event, env, ctx) {
     if (event.cron === EVENING_STATS_CRON) {
-      ctx.waitUntil(sendEveningStats(env));
-      ctx.waitUntil(prunePageViews(env.DB, addDays(getTodayMoscow(), -PAGEVIEW_RETENTION_DAYS)));
+      ctx.waitUntil(guardCron(env, 'вечерняя статистика', sendEveningStats(env)));
+      ctx.waitUntil(guardCron(env, 'очистка pageviews', prunePageViews(env.DB, addDays(getTodayMoscow(), -PAGEVIEW_RETENTION_DAYS))));
+      ctx.waitUntil(guardCron(env, 'очистка записей', deleteBookingsBefore(env.DB, addDays(getTodayMoscow(), -BOOKING_RETENTION_DAYS))));
     } else {
-      ctx.waitUntil(runReminderSweep(env));
+      ctx.waitUntil(guardCron(env, 'напоминания', runReminderSweep(env)));
     }
   }
 };

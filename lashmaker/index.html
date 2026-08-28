@@ -860,6 +860,8 @@
         </div>
         <input type="hidden" id="date" name="date" required>
         <input type="hidden" id="slotTime" name="slot_time" required>
+        <input type="text" name="hp" id="bkHp" tabindex="-1" autocomplete="off" aria-hidden="true"
+               style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;">
         <div class="form-grid-2">
           <div class="form-row"><label for="name">Имя</label><input type="text" id="name" name="name" placeholder="Как к вам обращаться" required></div>
           <div class="form-row"><label for="phone">Телефон</label><input type="tel" id="phone" name="phone" placeholder="+7 (___) ___-__-__" required></div>
@@ -882,7 +884,7 @@
         <div class="form-msg" id="formMsg"></div>
         <a href="#" class="btn btn-outline btn-block booking-confirm-link" id="bookingConfirmLink" target="_blank" rel="noopener" hidden>Подтвердить в Telegram — получить напоминание за 2 часа</a>
       </form>
-      <script src="assets/booking.js?v=3"></script>
+      <script src="assets/booking.js?v=4"></script>
     </div>
   </div>
 </section>
