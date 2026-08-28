@@ -312,7 +312,7 @@
   }
   @keyframes portraitGlow{0%,100%{opacity:.65;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06);}}
   .hero-portrait{position:relative;width:100%;height:100%;}
-  .hero-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 44px 70px rgba(0,0,0,.55)) saturate(1.04) contrast(1.04) brightness(1.02);transform:scaleX(-1);}
+  .hero-portrait img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:drop-shadow(0 44px 70px rgba(0,0,0,.55)) saturate(1.04) contrast(1.04) brightness(1.02);-webkit-mask-image:linear-gradient(to bottom,#000 74%,transparent 99%);mask-image:linear-gradient(to bottom,#000 74%,transparent 99%);}
   .hero-sparkle{position:absolute;width:5px;height:5px;background:#fff2d4;border-radius:50%;box-shadow:0 0 9px 3px rgba(232,200,118,.9);animation:heroSparkle 3.2s ease-in-out infinite;pointer-events:none;}
   @keyframes heroSparkle{0%,100%{opacity:0;transform:scale(.4);}50%{opacity:1;transform:scale(1);}}
   .hero-portrait-mobile{display:none;}
@@ -545,7 +545,7 @@
       border:1px solid rgba(201,162,74,.4);box-shadow:0 20px 40px -18px rgba(0,0,0,.7), 0 0 40px -10px rgba(201,162,74,.35);
       opacity:0;animation:fadeUp .8s ease forwards .15s;
     }
-    .hero-portrait-mobile img{width:100%;height:100%;object-fit:cover;object-position:50% 18%;filter:saturate(.9) contrast(1.05) brightness(.96) sepia(.05);transform:scaleX(-1);}
+    .hero-portrait-mobile img{width:100%;height:100%;object-fit:cover;object-position:50% 3%;filter:saturate(.95) contrast(1.03) brightness(.98);}
     .showcase{grid-template-columns:1fr;}
     .showcase-visual{border-right:none;border-bottom:1px solid var(--border);}
     .booking-wrap{grid-template-columns:1fr;}
@@ -647,7 +647,7 @@
   <div class="hero-fabric" aria-hidden="true"></div>
   <div class="container hero-inner">
     <div class="hero-text">
-      <div class="hero-portrait-mobile" aria-hidden="true"><img src="assets/photos/alexandra-portrait-suit-cutout.png?v=2" alt="Александра Рулева" width="640" height="640" decoding="async" fetchpriority="high" loading="eager"></div>
+      <div class="hero-portrait-mobile" aria-hidden="true"><img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="900" height="1211" decoding="async" fetchpriority="high" loading="eager"></div>
       <span class="eyebrow">Наращивание · Ламинирование ресниц</span>
       <h1><span class="shimmer-fill">Александра Рулева</span></h1>
       <p class="lead">Мастер по наращиванию и ламинированию ресниц. Барочная роскошь и внимание к каждой детали ради взгляда, достойного восхищения.</p>
@@ -662,7 +662,7 @@
       </div>
     </div>
     <div class="hero-portrait-frame" aria-hidden="true">
-      <div class="hero-portrait"><img src="assets/photos/alexandra-portrait-suit-cutout.png?v=2" alt="Александра Рулева" width="640" height="640" decoding="async" fetchpriority="high" loading="eager"></div>
+      <div class="hero-portrait"><img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="900" height="1211" decoding="async" fetchpriority="high" loading="eager"></div>
     </div>
   </div>
   <div class="scroll-cue" aria-hidden="true"><span>Листайте</span><div class="scroll-tick"></div></div>
