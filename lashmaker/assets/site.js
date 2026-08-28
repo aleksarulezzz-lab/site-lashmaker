@@ -187,17 +187,18 @@ CARE.forEach((text,i)=>{
   el.innerHTML = `<div class="care-num">0${i+1}</div><h4>Совет ${i+1}</h4><p>${text}</p>`;
   careGrid.appendChild(el);
 });
+// Демо-заглушки. На реальном сайте сюда подставляются настоящие отзывы.
 const REVIEWS = [
-  {name:'Анна, 27 лет', text:'Хожу к Александре уже год — ресницы всегда выглядят натурально и держатся до самой коррекции. Очень аккуратная работа!'},
-  {name:'Марина К.', text:'Делала 2D перед свадьбой у Александры — фотографии вышли потрясающие, глаза совсем другие. Спасибо огромное!'},
-  {name:'Ольга', text:'Ламинирование ресниц у Александры — находка. Месяц не крашу их, а взгляд всегда выглядит свежим и приподнятым.'},
+  {name:'Пример отзыва', text:'Хожу к мастеру уже год, ресницы всегда выглядят натурально и держатся до самой коррекции. Очень аккуратная работа.'},
+  {name:'Пример отзыва', text:'Делала 2D перед свадьбой, фотографии вышли потрясающие, глаза совсем другие. Спасибо огромное.'},
+  {name:'Пример отзыва', text:'Ламинирование ресниц оказалось находкой. Месяц не крашу их, а взгляд всегда выглядит свежим и приподнятым.'},
 ];
 const reviewsGrid = document.getElementById('reviewsGrid');
 REVIEWS.forEach(r=>{
   const el=document.createElement('div');
   el.className='review-card reveal';
   el.innerHTML = `<div class="stars">★★★★★</div><p>«${r.text}»</p>
-  <div class="review-author"><div class="review-avatar"></div><div><b>${r.name}</b><span>клиентка Александры</span></div></div>`;
+  <div class="review-author"><div class="review-avatar"></div><div><b>${r.name}</b><span>демонстрационный текст</span></div></div>`;
   reviewsGrid.appendChild(el);
 });
 const navToggle = document.querySelector('.nav-toggle');
