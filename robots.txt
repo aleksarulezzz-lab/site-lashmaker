@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Черновики и служебные страницы прототипа — не индексировать
+Disallow: /lashmaker/variant-
+Disallow: /lashmaker/preview.html
+Disallow: /lashmaker/design-history.html
+
+Sitemap: https://aleksarulezzz.ru/sitemap.xml
