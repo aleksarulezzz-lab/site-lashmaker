@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Кейс: сайт для бьюти-мастера с онлайн-записью и Telegram-ботом — Александра Рулева</title>
+<meta name="description" content="Разбор проекта: одностраничный сайт с онлайн-записью, Telegram-бот с подтверждением и напоминаниями, приватная аналитика. Как это устроено и из чего собрано.">
+<link rel="canonical" href="https://aleksarulezzz.ru/cases/lashmaker.html">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta name="theme-color" content="#0c0806">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://aleksarulezzz.ru/cases/lashmaker.html">
+<meta property="og:title" content="Кейс: сайт с онлайн-записью и Telegram-ботом">
+<meta property="og:description" content="Как устроен одностраничный сайт с записью, ботом-напоминалкой и приватной аналитикой.">
+<meta property="og:locale" content="ru_RU">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Кейс: сайт для бьюти-мастера с онлайн-записью и Telegram-ботом",
+  "author": { "@type": "Person", "name": "Александра Рулева", "url": "https://aleksarulezzz.ru/" },
+  "publisher": { "@type": "Person", "name": "Александра Рулева" },
+  "mainEntityOfPage": "https://aleksarulezzz.ru/cases/lashmaker.html",
+  "inLanguage": "ru-RU",
+  "about": "Разработка сайта с онлайн-записью, Telegram-бот, автоматизация"
+}
+</script>
+<style>
+  :root{--bg:#0c0806;--surface:#141009;--ink:#f4e9d6;--ink-soft:#b3a084;--accent:#c9a24a;--accent-strong:#e8c876;--border:#332419;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);
+    font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent);}a:hover{color:var(--accent-strong);}
+  a:focus-visible{outline:2px solid var(--accent-strong);outline-offset:3px;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+  .skip-link{position:absolute;left:8px;top:-48px;background:var(--accent);color:#1a1006;padding:10px 18px;font-weight:700;font-size:13px;border-radius:4px;transition:top .15s;}
+  .skip-link:focus{top:8px;}
+  header.top{border-bottom:1px solid var(--border);padding:20px 0;}
+  header.top .wrap{display:flex;justify-content:space-between;align-items:center;}
+  .logo{font-family:Georgia,serif;font-weight:700;}.logo b{color:var(--accent);}
+  .crumb{font-size:14px;color:var(--ink-soft);}
+  main{padding:56px 0 24px;}
+  .eyebrow{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:18px;}
+  h1{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1.15;margin-bottom:16px;}
+  .intro{font-size:19px;color:var(--ink-soft);margin-bottom:14px;}
+  h2{font-family:Georgia,serif;font-size:clamp(21px,3.5vw,27px);margin:44px 0 12px;}
+  h3{font-size:17px;margin:24px 0 6px;color:var(--ink);}
+  p{margin:12px 0;color:#e7dcc7;}
+  ul{margin:12px 0 12px 22px;}li{margin:7px 0;color:var(--ink-soft);}
+  .stack{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0;}
+  .stack div{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;font-size:14px;color:var(--ink-soft);}
+  .stack b{display:block;color:var(--ink);font-family:Georgia,serif;font-size:15px;margin-bottom:4px;}
+  .cta{display:flex;flex-wrap:wrap;gap:14px;margin:34px 0 8px;}
+  .btn{display:inline-flex;padding:14px 26px;border:1px solid var(--accent);border-radius:999px;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;}
+  .btn.primary{background:var(--accent);color:#1a1006;}.btn.primary:hover{background:var(--accent-strong);}
+  .btn.ghost{color:var(--accent);}.btn.ghost:hover{background:rgba(201,162,74,.1);}
+  footer{border-top:1px solid var(--border);padding:36px 0;color:var(--ink-soft);font-size:13px;text-align:center;margin-top:48px;}
+  footer b{color:var(--accent);font-family:Georgia,serif;}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">К основному содержимому</a>
+<header class="top">
+  <div class="wrap">
+    <span class="logo">Александра <b>Рулева</b></span>
+    <a class="crumb" href="/">← на главную</a>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <p class="eyebrow">Кейс · демо-проект</p>
+    <h1>Сайт для бьюти-мастера с онлайн-записью</h1>
+    <p class="intro">Одностраничный сайт мастера по наращиванию ресниц с настоящей онлайн-записью, Telegram-ботом и аналитикой. Собран целиком — от вёрстки до бэкенда.</p>
+    <p><a href="/lashmaker/" target="_blank" rel="noopener">Открыть демо →</a></p>
+
+    <h2>Задача</h2>
+    <p>У мастера красоты запись обычно идёт через личные сообщения: клиент пишет, мастер сверяется с блокнотом, вручную напоминает о визите. Это отнимает время и приводит к неявкам. Нужен сайт, где клиент сам выбирает свободное время, а рутина по подтверждению и напоминаниям уходит на автоматику.</p>
+
+    <h2>Что внутри</h2>
+    <div class="stack">
+      <div><b>Фронтенд</b>Один HTML-файл, адаптивная вёрстка, светлая/тёмная тема. Хостинг статики — GitHub Pages, свой домен.</div>
+      <div><b>Бэкенд</b>Serverless-воркер (Cloudflare Workers): API записи, доступные слоты, вебхук бота, ночные задачи по расписанию.</div>
+      <div><b>База</b>SQLite-совместимая база на периферии (Cloudflare D1): записи, сессии бота, обезличенные просмотры.</div>
+      <div><b>Бот</b>Telegram-бот на том же воркере: уведомления мастеру, подтверждение визита клиентом, напоминания.</div>
+    </div>
+    <p>Постоянного сервера нет — всё работает по запросу и по расписанию, поэтому и стоимость близка к нулю, и падать особо нечему.</p>
+
+    <h2>Как работает запись</h2>
+    <ul>
+      <li>Сайт запрашивает свободные слоты на ближайшие рабочие дни и показывает календарь.</li>
+      <li>Клиент выбирает день и время, оставляет имя и телефон.</li>
+      <li>Воркер проверяет, что слот ещё свободен, и атомарно его бронирует — двойная запись на одно время невозможна.</li>
+      <li>Мастеру сразу приходит уведомление в Telegram с деталями заявки.</li>
+      <li>Клиенту возвращается ссылка: перейдя по ней в бота, он подтверждает визит и подписывается на напоминание.</li>
+    </ul>
+
+    <h2>Бот и напоминания</h2>
+    <p>Бот приватный — управляет им только мастер. Команды: записи на сегодня/завтра/произвольную дату, ручное создание записи, сводка по посещаемости сайта. Каждые несколько минут воркер проверяет предстоящие визиты и за два часа до начала присылает клиенту напоминание — но только тем, кто подтвердил запись по ссылке.</p>
+
+    <h2>Аналитика</h2>
+    <p>Считать посетителей — мало; важно понимать, откуда они и доходят ли до заявки. На сайте два слоя аналитики:</p>
+    <ul>
+      <li>Лёгкий счётчик без cookie: вместо IP хранится дневной хэш, между днями посетитель не отслеживается.</li>
+      <li>Свои метрики: источник перехода (в том числе UTM), страна, время на странице, событие отправки заявки.</li>
+    </ul>
+    <p>Раз в день мастеру в Telegram уходит понятная сводка: посетители и просмотры с динамикой ко вчера, откуда переходят, из каких стран, что смотрят, работает ли сайт. Плюс страница со статистикой за 7 и 30 дней.</p>
+
+    <h2>Безопасность и качество</h2>
+    <ul>
+      <li>Формы защищены ловушкой-honeypot и ограничением частоты запросов по IP.</li>
+      <li>Content-Security-Policy, весь JavaScript вынесен в отдельные файлы, аналитика захостена у себя.</li>
+      <li>Диапазоны дат и запросы ограничены, чтобы эндпоинты нельзя было перегрузить.</li>
+      <li>Данные не копятся вечно: старые просмотры и записи автоматически удаляются.</li>
+      <li>Бэкенд покрыт юнит-тестами, они прогоняются автоматически на каждое изменение.</li>
+    </ul>
+
+    <div class="cta">
+      <a class="btn primary" href="/lashmaker/" target="_blank" rel="noopener">Открыть демо</a>
+      <a class="btn ghost" href="/#contact">Нужен такой проект</a>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap">© 2026 <b>Александра Рулева</b> · <a href="/">aleksarulezzz.ru</a></div></footer>
+</body>
+</html>
