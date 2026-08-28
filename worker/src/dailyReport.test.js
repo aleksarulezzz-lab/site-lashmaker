@@ -3,15 +3,17 @@ import assert from 'node:assert/strict';
 
 let daily = {};
 let countries = [];
+let sources = [];
 mock.module('./analytics.js', {
   exports: {
     getDailyStats: async (db, date) => daily[date] || { views: 0, visitors: 0, avgDwellSec: 0, topPaths: [] },
-    getDailyCountries: async () => countries
+    getDailyCountries: async () => countries,
+    getDailySources: async () => sources
   }
 });
 
 const {
-  buildDailyReport, formatLongDate, flagEmoji, formatDelta, shortPath
+  buildDailyReport, formatLongDate, flagEmoji, formatDelta, shortPath, sourceLabel
 } = await import('./dailyReport.js');
 
 test('formatLongDate renders a Russian "D month YYYY" label', () => {
@@ -34,6 +36,13 @@ test('formatDelta compares against the previous day', () => {
   assert.equal(formatDelta(0, 0), '');
 });
 
+test('sourceLabel prettifies known hosts, passes others through', () => {
+  assert.equal(sourceLabel('dzen.ru'), 'Дзен');
+  assert.equal(sourceLabel('t.me'), 'Telegram');
+  assert.equal(sourceLabel('direct'), 'Прямые заходы');
+  assert.equal(sourceLabel('example.org'), 'example.org');
+});
+
 test('shortPath keeps only the last segment', () => {
   assert.equal(shortPath('/lashmaker/variant-12-baroque-silk-drape.html'), 'variant-12-baroque-silk-drape.html');
   assert.equal(shortPath('/'), 'главная');
@@ -47,6 +56,7 @@ test('buildDailyReport assembles every section with the day-over-day deltas', as
     '2026-08-26': { views: 6, visitors: 3, avgDwellSec: 20, topPaths: [] }
   };
   countries = [{ country: 'RU', views: 9 }, { country: 'KZ', views: 2 }];
+  sources = [{ source: 'dzen.ru', views: 7 }, { source: 'direct', views: 4 }];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => ({ status: 200 });
   try {
@@ -58,6 +68,9 @@ test('buildDailyReport assembles every section with the day-over-day deltas', as
     assert.match(text, /⏱ Среднее время на сайте: 48 сек/);
     assert.match(text, /🇷🇺 RU: 9/);
     assert.match(text, /🇰🇿 KZ: 2/);
+    assert.match(text, /🔗 Откуда переходят/);
+    assert.match(text, /Дзен: 7/);
+    assert.match(text, /Прямые заходы: 4/);
     assert.match(text, /variant-12-baroque-silk-drape\.html — 8/);
     assert.match(text, /главная — 5/);
   } finally {
@@ -68,13 +81,14 @@ test('buildDailyReport assembles every section with the day-over-day deltas', as
 test('buildDailyReport reports a down site and empty sections gracefully', async () => {
   daily = {};
   countries = [];
+  sources = [];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => { throw new Error('unreachable'); };
   try {
     const text = await buildDailyReport({ DB: {} }, '2026-08-27');
     assert.match(text, /🔴 Сайт недоступен/);
     assert.match(text, /👥 Посетители: 0/);
-    assert.equal((text.match(/\(нет данных\)/g) || []).length, 2);
+    assert.equal((text.match(/\(нет данных\)/g) || []).length, 3);
   } finally {
     globalThis.fetch = originalFetch;
   }

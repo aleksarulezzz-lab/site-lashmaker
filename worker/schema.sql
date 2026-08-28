@@ -41,11 +41,13 @@ CREATE TABLE IF NOT EXISTS page_views (
   country TEXT,
   view_id TEXT,
   dwell_ms INTEGER,
+  source TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_page_views_date ON page_views(date);
 CREATE INDEX IF NOT EXISTS idx_page_views_view_id ON page_views(view_id);
+CREATE INDEX IF NOT EXISTS idx_page_views_source ON page_views(source);
 
 -- Records which migration-*.sql files have been applied to this database.
 -- Each migration file ends with an INSERT of its own name here.

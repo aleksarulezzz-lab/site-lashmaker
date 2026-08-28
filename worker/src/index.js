@@ -3,7 +3,7 @@ import { getBookedSlotsInRange, createBooking, getAdminChatId, deleteBookingsBef
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
 import { runReminderSweep } from './reminders.js';
-import { hashVisitor, recordPageView, recordDwell, prunePageViews, getDailyStats, getRangeStats, getRangeCountries } from './analytics.js';
+import { hashVisitor, recordPageView, recordDwell, prunePageViews, getDailyStats, getRangeStats, getRangeCountries, getRangeSources } from './analytics.js';
 import { renderStatsPage } from './statsPage.js';
 import { sendEveningStats } from './dailyStats.js';
 import { ALLOWED_ORIGINS, timingSafeEqual, beaconSourceAllowed } from './httpGuards.js';
@@ -172,11 +172,12 @@ async function handleTrack(request, env, cors) {
     return noContent();
   }
   const path = typeof body?.path === 'string' && body.path ? body.path.slice(0, 200) : '/';
+  const source = typeof body?.source === 'string' && body.source ? body.source.slice(0, 60) : null;
   const ua = request.headers.get('User-Agent') || 'unknown';
   const country = request.headers.get('CF-IPCountry') || null;
   const date = getTodayMoscow();
   const visitorHash = await hashVisitor(ip, ua, date);
-  await recordPageView(env.DB, { date, path, visitorHash, viewId, country });
+  await recordPageView(env.DB, { date, path, visitorHash, viewId, country, source });
   return noContent();
 }
 
@@ -191,14 +192,15 @@ async function handleStats(request, env) {
     return new Response('Unauthorized', { status: 401 });
   }
   const today = getTodayMoscow();
-  const [todayStats, week, twoWeeks, month, countries] = await Promise.all([
+  const [todayStats, week, twoWeeks, month, countries, sources] = await Promise.all([
     getDailyStats(env.DB, today),
     getRangeStats(env.DB, addDays(today, -6), today),
     getRangeStats(env.DB, addDays(today, -13), today),
     getRangeStats(env.DB, addDays(today, -29), today),
-    getRangeCountries(env.DB, addDays(today, -6), today, 8)
+    getRangeCountries(env.DB, addDays(today, -6), today, 8),
+    getRangeSources(env.DB, addDays(today, -6), today, 8)
   ]);
-  const html = renderStatsPage({ today, todayStats, week, month, byDay: twoWeeks.byDay, countries });
+  const html = renderStatsPage({ today, todayStats, week, month, byDay: twoWeeks.byDay, countries, sources });
   return new Response(html, {
     status: 200,
     headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }

@@ -1,6 +1,21 @@
 import { addDays } from './slots.js';
-import { getDailyStats, getDailyCountries } from './analytics.js';
+import { getDailyStats, getDailyCountries, getDailySources } from './analytics.js';
 import { escapeHtml } from './telegram.js';
+
+// Pretty labels for the common traffic sources; anything else shows as-is.
+const SOURCE_LABELS = {
+  direct: 'Прямые заходы',
+  'dzen.ru': 'Дзен', 'zen.yandex.ru': 'Дзен',
+  't.me': 'Telegram', 'telegram.me': 'Telegram',
+  'youtube.com': 'YouTube', 'm.youtube.com': 'YouTube',
+  'vk.com': 'VK', 'vk.ru': 'VK',
+  'instagram.com': 'Instagram', 'l.instagram.com': 'Instagram',
+  'google.com': 'Google', 'yandex.ru': 'Яндекс', 'ya.ru': 'Яндекс'
+};
+
+export function sourceLabel(src) {
+  return SOURCE_LABELS[src] || src;
+}
 
 const MONTHS_RU = [
   'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
@@ -51,10 +66,11 @@ async function pingSite(url) {
 // and the on-demand /stats bot command.
 export async function buildDailyReport(env, date) {
   const domain = env.SITE_DOMAIN || 'aleksarulezzz.ru';
-  const [today, prev, countries, ping] = await Promise.all([
+  const [today, prev, countries, sources, ping] = await Promise.all([
     getDailyStats(env.DB, date),
     getDailyStats(env.DB, addDays(date, -1)),
     getDailyCountries(env.DB, date),
+    getDailySources(env.DB, date),
     pingSite(`https://${domain}/`)
   ]);
 
@@ -71,6 +87,12 @@ export async function buildDailyReport(env, date) {
   ];
   if (countries.length) {
     for (const c of countries) lines.push(`${flagEmoji(c.country)} ${escapeHtml(c.country)}: ${c.views}`);
+  } else {
+    lines.push('  (нет данных)');
+  }
+  lines.push('', '🔗 Откуда переходят');
+  if (sources.length) {
+    for (const s of sources) lines.push(`${escapeHtml(sourceLabel(s.source))}: ${s.views}`);
   } else {
     lines.push('  (нет данных)');
   }

@@ -4,10 +4,10 @@ export async function hashVisitor(ip, userAgent, date) {
   return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function recordPageView(db, { date, path, visitorHash, viewId = null, country = null }) {
+export async function recordPageView(db, { date, path, visitorHash, viewId = null, country = null, source = null }) {
   await db.prepare(
-    `INSERT INTO page_views (date, path, visitor_hash, view_id, country) VALUES (?, ?, ?, ?, ?)`
-  ).bind(date, path, visitorHash, viewId, country).run();
+    `INSERT INTO page_views (date, path, visitor_hash, view_id, country, source) VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(date, path, visitorHash, viewId, country, source).run();
 }
 
 // Follow-up "page unload" beacon: record how long the visit lasted. Matches the
@@ -81,6 +81,21 @@ export async function getRangeCountries(db, fromDate, toDate, limit = 6) {
 
 export function getDailyCountries(db, date, limit = 6) {
   return getRangeCountries(db, date, date, limit);
+}
+
+// Visits grouped by traffic source (utm_source / referring host / 'direct')
+// over an inclusive range, busiest first.
+export async function getRangeSources(db, fromDate, toDate, limit = 6) {
+  const { results } = await db.prepare(
+    `SELECT source, COUNT(*) as views FROM page_views
+     WHERE date >= ? AND date <= ? AND source IS NOT NULL AND source != ''
+     GROUP BY source ORDER BY views DESC LIMIT ?`
+  ).bind(fromDate, toDate, limit).all();
+  return results || [];
+}
+
+export function getDailySources(db, date, limit = 6) {
+  return getRangeSources(db, date, date, limit);
 }
 
 // Retention: drop pageview rows older than the cutoff so a flood (or just time)

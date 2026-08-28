@@ -1,5 +1,5 @@
 import { formatDateLabel } from './slots.js';
-import { flagEmoji } from './dailyReport.js';
+import { flagEmoji, sourceLabel } from './dailyReport.js';
 
 function esc(value) {
   return String(value)
@@ -13,7 +13,7 @@ function esc(value) {
 // `todayStats` / `week` / `month` each look like { views, visitors, avgDwellSec, ... };
 // `week.topPaths` is [{ path, views }]; `byDay` is [{ date, views, visitors }] newest first;
 // `countries` is [{ country, views }] over the last 7 days.
-export function renderStatsPage({ today, todayStats, week, month, byDay, countries }) {
+export function renderStatsPage({ today, todayStats, week, month, byDay, countries, sources }) {
   const card = (title, s) => `
       <div class="card">
         <h2>${esc(title)}</h2>
@@ -30,6 +30,11 @@ export function renderStatsPage({ today, todayStats, week, month, byDay, countri
   const cc = countries || [];
   const countryRows = cc.length
     ? cc.map(c => `<tr><td>${flagEmoji(c.country)} ${esc(c.country)}</td><td>${c.views}</td></tr>`).join('')
+    : '<tr><td colspan="2" class="empty">нет данных</td></tr>';
+
+  const src = sources || [];
+  const sourceRows = src.length
+    ? src.map(s => `<tr><td>${esc(sourceLabel(s.source))}</td><td>${s.views}</td></tr>`).join('')
     : '<tr><td colspan="2" class="empty">нет данных</td></tr>';
 
   const days = byDay || [];
@@ -82,6 +87,8 @@ export function renderStatsPage({ today, todayStats, week, month, byDay, countri
   </div>
   <h3>Топ страниц за 7 дней</h3>
   <table><thead><tr><th>Страница</th><th>Просмотры</th></tr></thead><tbody>${topRows}</tbody></table>
+  <h3>Откуда переходят (7 дней)</h3>
+  <table><thead><tr><th>Источник</th><th>Просмотры</th></tr></thead><tbody>${sourceRows}</tbody></table>
   <h3>Откуда приходят (7 дней)</h3>
   <table><thead><tr><th>Страна</th><th>Просмотры</th></tr></thead><tbody>${countryRows}</tbody></table>
   <h3>По дням (2 недели)</h3>

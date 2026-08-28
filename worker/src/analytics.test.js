@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hashVisitor, getRangeStats, getRangeCountries, prunePageViews } from './analytics.js';
+import { hashVisitor, getRangeStats, getRangeCountries, getRangeSources, prunePageViews } from './analytics.js';
 
 // Minimal in-memory stand-in for a D1 prepared statement, enough to exercise
 // the queries getRangeStats / getRangeCountries run.
@@ -58,6 +58,18 @@ function fakeDb(rows) {
                 .sort((a, b) => b.views - a.views)
             };
           }
+          if (/GROUP BY source/.test(sql)) {
+            const byS = new Map();
+            for (const r of inRange) {
+              if (r.source == null || r.source === '') continue;
+              byS.set(r.source, (byS.get(r.source) || 0) + 1);
+            }
+            return {
+              results: [...byS.entries()]
+                .map(([source, views]) => ({ source, views }))
+                .sort((a, b) => b.views - a.views)
+            };
+          }
           const byDate = new Map();
           for (const r of inRange) {
             if (!byDate.has(r.date)) byDate.set(r.date, new Set());
@@ -101,12 +113,12 @@ test('hashVisitor differs for different user agents on the same day', async () =
 });
 
 const RANGE_ROWS = [
-  { date: '2026-08-25', path: '/a', visitor_hash: 'v1', dwell_ms: 10000, country: 'RU' },
-  { date: '2026-08-25', path: '/a', visitor_hash: 'v1', dwell_ms: 30000, country: 'RU' },
-  { date: '2026-08-25', path: '/b', visitor_hash: 'v2', country: 'KZ' },
-  { date: '2026-08-26', path: '/a', visitor_hash: 'v3', country: 'XX' },
-  { date: '2026-08-27', path: '/a', visitor_hash: 'v1', country: 'RU' },
-  { date: '2026-08-20', path: '/a', visitor_hash: 'v9', country: 'RU' } // outside the window below
+  { date: '2026-08-25', path: '/a', visitor_hash: 'v1', dwell_ms: 10000, country: 'RU', source: 'direct' },
+  { date: '2026-08-25', path: '/a', visitor_hash: 'v1', dwell_ms: 30000, country: 'RU', source: 'dzen.ru' },
+  { date: '2026-08-25', path: '/b', visitor_hash: 'v2', country: 'KZ', source: 'direct' },
+  { date: '2026-08-26', path: '/a', visitor_hash: 'v3', country: 'XX', source: 't.me' },
+  { date: '2026-08-27', path: '/a', visitor_hash: 'v1', country: 'RU', source: 'direct' },
+  { date: '2026-08-20', path: '/a', visitor_hash: 'v9', country: 'RU', source: 'direct' } // outside the window below
 ];
 
 test('getRangeStats totals views, distinct visitors and average dwell within the inclusive range', async () => {
@@ -136,6 +148,15 @@ test('getRangeCountries ranks countries and drops the XX / T1 placeholders', asy
   assert.deepEqual(countries, [
     { country: 'RU', views: 3 },
     { country: 'KZ', views: 1 }
+  ]);
+});
+
+test('getRangeSources ranks traffic sources and ignores empty ones', async () => {
+  const sources = await getRangeSources(fakeDb(RANGE_ROWS), '2026-08-25', '2026-08-27');
+  assert.deepEqual(sources, [
+    { source: 'direct', views: 3 },
+    { source: 'dzen.ru', views: 1 },
+    { source: 't.me', views: 1 }
   ]);
 });
 

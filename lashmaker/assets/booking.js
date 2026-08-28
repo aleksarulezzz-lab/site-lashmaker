@@ -164,6 +164,7 @@
       if(!res.ok){ throw new Error('failed'); }
       return res.json();
     }).then(function(data){
+      try { if (window.umami) window.umami.track('booking_submit', { service: service }); } catch(e){}
       msgEl.textContent = 'Спасибо, ' + name + '! Заявка отправлена — я свяжусь с вами для подтверждения записи.';
       msgEl.className = 'form-msg is-success';
       if(data && data.confirmUrl){

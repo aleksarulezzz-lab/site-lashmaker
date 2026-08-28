@@ -14,6 +14,10 @@ const base = {
   countries: [
     { country: 'RU', views: 30 },
     { country: 'KZ', views: 4 }
+  ],
+  sources: [
+    { source: 'dzen.ru', views: 20 },
+    { source: 'direct', views: 14 }
   ]
 };
 
@@ -27,10 +31,11 @@ test('renders the today / 7-day / 30-day totals and average time', () => {
   assert.match(html, /61 сек на сайте/);
 });
 
-test('renders one row per top path, country and day', () => {
+test('renders one row per top path, country, source and day', () => {
   const html = renderStatsPage(base);
   assert.match(html, /variant-12-baroque-silk-drape\.html<\/td><td>28/);
   assert.match(html, /🇷🇺 RU<\/td><td>30/);
+  assert.match(html, /Дзен<\/td><td>20/);
   assert.match(html, /Чт 27\.08<\/td><td>6<\/td><td>3/);
   assert.match(html, /Ср 26\.08<\/td><td>9<\/td><td>4/);
 });
@@ -44,19 +49,20 @@ test('escapes HTML in a page path so it cannot inject markup', () => {
   assert.doesNotMatch(html, /<script>evil/);
 });
 
-test('shows "нет данных" when there are no paths, countries or days', () => {
+test('shows "нет данных" when there are no paths, sources, countries or days', () => {
   const html = renderStatsPage({
     today: '2026-08-27',
     todayStats: { views: 0, visitors: 0, avgDwellSec: 0 },
     week: { views: 0, visitors: 0, avgDwellSec: 0, topPaths: [] },
     month: { views: 0, visitors: 0, avgDwellSec: 0 },
     byDay: [],
-    countries: []
+    countries: [],
+    sources: []
   });
-  assert.equal((html.match(/нет данных/g) || []).length, 3);
+  assert.equal((html.match(/нет данных/g) || []).length, 4);
 });
 
-test('tolerates missing topPaths / countries arrays', () => {
-  const html = renderStatsPage({ ...base, week: { views: 0, visitors: 0, avgDwellSec: 0 }, countries: undefined });
-  assert.equal((html.match(/нет данных/g) || []).length, 2);
+test('tolerates missing topPaths / countries / sources arrays', () => {
+  const html = renderStatsPage({ ...base, week: { views: 0, visitors: 0, avgDwellSec: 0 }, countries: undefined, sources: undefined });
+  assert.equal((html.match(/нет данных/g) || []).length, 3);
 });

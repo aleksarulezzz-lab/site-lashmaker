@@ -13,6 +13,20 @@
   var start = Date.now();
   var dwellSent = false;
 
+  // Where this visit came from: ?utm_source=… wins, else the referring host,
+  // else "direct". Computed here so the server just needs GROUP BY.
+  function trafficSource() {
+    try {
+      var utm = new URLSearchParams(location.search).get('utm_source');
+      if (utm) return utm.slice(0, 60);
+      if (document.referrer) {
+        var h = new URL(document.referrer).hostname.replace(/^www\./, '');
+        if (h && h !== location.hostname) return h.slice(0, 60);
+      }
+    } catch (e) {}
+    return 'direct';
+  }
+
   function send(payload) {
     try {
       var body = JSON.stringify(payload);
@@ -30,7 +44,7 @@
   }
 
   // Pageview on load.
-  send({ path: location.pathname, viewId: viewId });
+  send({ path: location.pathname, viewId: viewId, source: trafficSource() });
 
   // Follow-up beacon with time-on-page. Sent the first time the page is hidden
   // (tab switch or navigation away) — best-effort: some mobile browsers kill the
