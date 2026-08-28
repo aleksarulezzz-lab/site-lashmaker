@@ -11,7 +11,8 @@
 <link rel="canonical" href="https://aleksarulezzz.ru/lashmaker/">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="A5SJe1rmsutj-HVrFL6ggKqdN8h0lKGcTcdxc3-_sIE" />
-<meta name="theme-color" content="#0c0806">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0806" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Александра Рулева">
@@ -104,7 +105,7 @@
     --bg-soft:#f3e8d0;
     --surface:#ffffff;
     --ink:#3a2a14;
-    --ink-soft:#8a7457;
+    --ink-soft:#7a6449;
     --accent:#b8863a;
     --accent-strong:#d9a84f;
     --accent-2:#7a5a24;
@@ -517,6 +518,7 @@
   .pupil-shape{fill:var(--ink);}
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
     .marquee-track{animation:none;}
     .shimmer-fill{animation:none;background-position:0 center;}
     .fl-path,.flourish-divider-svg rect{transition-duration:.01ms;}
@@ -575,9 +577,18 @@
     .curl-tab{padding:11px 20px;font-size:16px;}
     .flourish-divider-wrap{padding:44px 0 0;}
   }
+
+  /* --- a11y additions --- */
+  .skip-link{position:absolute;left:8px;top:-48px;z-index:1000;background:var(--accent);color:#1a1006;
+    padding:10px 18px;font-family:var(--font-body);font-weight:700;font-size:13px;text-decoration:none;
+    border-radius:4px;transition:top .15s ease;}
+  .skip-link:focus{top:8px;}
+  a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
+  [tabindex]:focus-visible,summary:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px;border-radius:2px;}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">К основному содержимому</a>
 <div class="page-backdrop" aria-hidden="true"></div>
 <div class="curtain" aria-hidden="true">
   <div class="curtain-panel curtain-left"></div>
@@ -627,11 +638,12 @@
     </div>
   </div>
 </header>
+<main id="main">
 <section class="hero" id="top">
   <div class="hero-fabric" aria-hidden="true"></div>
   <div class="container hero-inner">
     <div class="hero-text">
-      <div class="hero-portrait-mobile" aria-hidden="true"><img src="assets/photos/alexandra-portrait-suit-cutout.png?v=2" alt="Александра Рулева" loading="eager"></div>
+      <div class="hero-portrait-mobile" aria-hidden="true"><img src="assets/photos/alexandra-portrait-suit-cutout.png?v=2" alt="Александра Рулева" width="640" height="640" decoding="async" fetchpriority="high" loading="eager"></div>
       <span class="eyebrow">Наращивание · Ламинирование ресниц</span>
       <h1><span class="shimmer-fill">Александра Рулева</span></h1>
       <p class="lead">Мастер по наращиванию и ламинированию ресниц. Барочная роскошь и внимание к каждой детали — для взгляда, достойного восхищения.</p>
@@ -646,7 +658,7 @@
       </div>
     </div>
     <div class="hero-portrait-frame" aria-hidden="true">
-      <div class="hero-portrait"><img src="assets/photos/alexandra-portrait-suit-cutout.png?v=2" alt="Александра Рулева" loading="eager"></div>
+      <div class="hero-portrait"><img src="assets/photos/alexandra-portrait-suit-cutout.png?v=2" alt="Александра Рулева" width="640" height="640" decoding="async" fetchpriority="high" loading="eager"></div>
     </div>
   </div>
   <div class="scroll-cue" aria-hidden="true"><span>Листайте</span><div class="scroll-tick"></div></div>
@@ -884,7 +896,7 @@
           </select>
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="bookingSubmitBtn" disabled>Отправить заявку</button>
-        <div class="form-msg" id="formMsg"></div>
+        <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
         <a href="#" class="btn btn-outline btn-block booking-confirm-link" id="bookingConfirmLink" target="_blank" rel="noopener" hidden>Подтвердить в Telegram — получить напоминание за 2 часа</a>
       </form>
       <script src="assets/booking.js?v=4"></script>
@@ -904,6 +916,7 @@
     </div>
   </div>
 </section>
+</main>
 <footer>
   <div class="container">
     <div style="max-width:640px;margin:0 auto 20px;text-align:left;line-height:1.7;font-size:13.5px;">
