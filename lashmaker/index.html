@@ -312,7 +312,7 @@
   }
   @keyframes portraitGlow{0%,100%{opacity:.65;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06);}}
   .hero-portrait{position:relative;width:100%;height:100%;}
-  .hero-portrait img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:drop-shadow(0 44px 70px rgba(0,0,0,.55)) saturate(1.04) contrast(1.04) brightness(1.02);-webkit-mask-image:linear-gradient(to bottom,#000 74%,transparent 99%);mask-image:linear-gradient(to bottom,#000 74%,transparent 99%);}
+  .hero-portrait img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:drop-shadow(0 44px 70px rgba(0,0,0,.55)) saturate(1.04) contrast(1.04) brightness(1.02);-webkit-mask-image:linear-gradient(to bottom,#000 74%,transparent 99%);mask-image:linear-gradient(to bottom,#000 74%,transparent 99%);transform:scaleX(-1);}
   .hero-sparkle{position:absolute;width:5px;height:5px;background:#fff2d4;border-radius:50%;box-shadow:0 0 9px 3px rgba(232,200,118,.9);animation:heroSparkle 3.2s ease-in-out infinite;pointer-events:none;}
   @keyframes heroSparkle{0%,100%{opacity:0;transform:scale(.4);}50%{opacity:1;transform:scale(1);}}
   .hero-portrait-mobile{display:none;}
@@ -545,7 +545,7 @@
       border:1px solid rgba(201,162,74,.4);box-shadow:0 20px 40px -18px rgba(0,0,0,.7), 0 0 40px -10px rgba(201,162,74,.35);
       opacity:0;animation:fadeUp .8s ease forwards .15s;
     }
-    .hero-portrait-mobile img{width:100%;height:100%;object-fit:cover;object-position:50% 3%;filter:saturate(.95) contrast(1.03) brightness(.98);}
+    .hero-portrait-mobile img{width:100%;height:100%;object-fit:cover;object-position:50% 3%;filter:saturate(.95) contrast(1.03) brightness(.98);transform:scaleX(-1);}
     .showcase{grid-template-columns:1fr;}
     .showcase-visual{border-right:none;border-bottom:1px solid var(--border);}
     .booking-wrap{grid-template-columns:1fr;}
