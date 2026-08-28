@@ -6,3 +6,6 @@ worker/.wrangler/
 .claude/
 .agents/
 skills-lock.json
+
+# исходники фото для галереи (обработанные лежат в lashmaker/assets/works/)
+primeri rabot/

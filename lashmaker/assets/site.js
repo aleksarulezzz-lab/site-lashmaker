@@ -79,21 +79,20 @@ if(heroPortraitFrame){
   });
 }
 const PORTFOLIO = [
-  {cat:'classic', title:'Классика', sub:'нежный эффект'},
-  {cat:'volume2d', title:'2D объём', sub:'лёгкая пушистость'},
-  {cat:'volume3d', title:'3D объём', sub:'эффект макияжа'},
-  {cat:'lamination', title:'Ламинирование', sub:'+ ботокс ресниц'},
-  {cat:'classic', title:'Классика', sub:'коричневый микс'},
-  {cat:'volume2d', title:'Голливудский 2D', sub:'акцент на внешний уголок'},
-  {cat:'volume3d', title:'Мега объём', sub:'4D–5D'},
-  {cat:'lamination', title:'Ламинирование', sub:'ресниц и бровей'},
+  {cat:'classic',    title:'Классика',      sub:'натуральный эффект',        img:'work-classic.jpg',    w:1100, h:797},
+  {cat:'volume2d',   title:'2D объём',      sub:'лёгкая пушистость',         img:'work-2d.jpg',         w:1100, h:733},
+  {cat:'volume3d',   title:'3D объём',      sub:'выразительный, эффект макияжа', img:'work-3d.jpg',      w:1100, h:825},
+  {cat:'lamination', title:'Ламинирование', sub:'подъём и блеск своих ресниц', img:'work-lamination.jpg', w:1100, h:953},
 ];
 const grid = document.getElementById('portfolioGrid');
 PORTFOLIO.forEach(item=>{
   const div = document.createElement('div');
   div.className='photo-card reveal';
   div.dataset.category=item.cat;
-  div.innerHTML = `<div class="photo-thumb"><svg class="orn-watermark" viewBox="0 0 100 100"><use href="#flourish-fleur"></use></svg><svg class="lash-thumb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg></div>
+  const thumb = item.img
+    ? `<img class="photo-photo" src="assets/works/${item.img}" alt="Пример работы: ${item.title}" width="${item.w}" height="${item.h}" loading="lazy" decoding="async">`
+    : `<svg class="orn-watermark" viewBox="0 0 100 100"><use href="#flourish-fleur"></use></svg><svg class="lash-thumb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  div.innerHTML = `<div class="photo-thumb">${thumb}</div>
   <div class="photo-cap">${item.title}<span>${item.sub}</span></div>`;
   grid.appendChild(div);
 });
