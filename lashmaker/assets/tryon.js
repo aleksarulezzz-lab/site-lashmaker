@@ -113,13 +113,21 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
   for(var i=0;i<n;i++){
     var t = (i+0.5)/n;
     var base = pointAtLength(upperPts, t*total);
-    var normal = norm(sub(base, lowerCenter));
-    /* t=0 — внешний уголок глаза, t=1 — внутренний (порядок точек в EYE_DEFS.upper для обоих глаз).
-       Длина должна плавно расти от внутреннего к внешнему уголку ("кошачий" эффект), а не быть
+    /* t=0 — внешний уголок глаза, t=1 — внутренний (порядок точек в EYE_DEFS.upper для обоих глаз). */
+    var rawNormal = norm(sub(base, lowerCenter));
+    /* у внешнего уголка вектор "от центра глаза" почти горизонтальный, поэтому на сильном
+       изгибе (CC/D) ресница уходила вниз-вбок на веко. Плавно (только внешние 40% ряда,
+       без резкой границы) подтягиваем направление роста к вертикали середины глаза. */
+    var upMix = 0.55 * (1 - clamp(t/0.4, 0, 1));
+    var normal = upMix > 0 ? norm(add(scl(rawNormal, 1-upMix), scl(midNormal, upMix))) : rawNormal;
+    /* Длина должна плавно расти от внутреннего к внешнему уголку ("кошачий" эффект), а не быть
        симметричной с пиком в середине. */
     var outerness = 1-t;
     var smooth = outerness*outerness*(3-2*outerness);
     var lenScale = 0.42+0.58*smooth;
+    /* и подкрутку у самого внешнего уголка ослабляем (внешние ~20% ряда), чтобы кончик
+       "стрелки" не заваливался под линию века */
+    var curlFade = 0.45 + 0.55*clamp(t/0.22, 0, 1);
     var fanCount = style.fanCount;
     var spreadDeg = fanCount>1 ? Math.min(9 + fanCount*1.4, 18) : 0;
     for(var j=0;j<fanCount;j++){
@@ -129,7 +137,7 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
       var jitter = pseudoRand(i*13 + j*7);
       var lashLen = Math.max(eyeWidth*style.lengthRatio*lenScale*(0.94+0.12*jitter), minLen*lenScale);
       var bw = style.baseWidth*refScale*(0.95+0.1*pseudoRand(i*3+j*11));
-      var bendDeg = curlBend * (0.55 + 0.45*lenScale);
+      var bendDeg = curlBend * (0.55 + 0.45*lenScale) * curlFade;
       fillTaperedStrand(ctx, base, dir, perp, lashLen, bendDeg, bw, color);
     }
   }
@@ -427,5 +435,10 @@ function init(){
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+
+/* отладочный хук для визуальной проверки геометрии ресниц (?tryondebug в URL); в обычном режиме не активен */
+if(typeof location !== 'undefined' && location.search.indexOf('tryondebug') >= 0){
+  window.__tryonDebug = { drawLashesOnEye: drawLashesOnEye, STYLE_DATA: STYLE_DATA, STYLE_ORDER: STYLE_ORDER, CURL_RENDER: CURL_RENDER };
+}
 
 })();
