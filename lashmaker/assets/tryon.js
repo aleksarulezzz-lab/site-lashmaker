@@ -110,16 +110,8 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
      и ресницы начинают смотреть в разные стороны ("растрёпанный" эффект) */
   var midNormal = norm(sub(pointAtLength(upperPts, total*0.5), lowerCenter));
   var hookSign = (-midNormal.y*outerDir.x + midNormal.x*outerDir.y) >= 0 ? 1 : -1;
-  /* "верх" по оси глаза (перпендикуляр к линии внешний-внутренний уголок, направленный вверх экрана) */
-  var eyeUp = norm({x: outerDir.y, y: -outerDir.x});
-  if(eyeUp.y > 0) eyeUp = {x:-eyeUp.x, y:-eyeUp.y};
-  /* целевое направление роста у внешнего уголка: вверх по оси глаза с лёгким наклоном наружу
-     (естественный кончик "стрелки"), но НЕ вбок-горизонтально и не вниз */
-  var cornerDir = norm(add(eyeUp, scl(outerDir, 0.35)));
   for(var i=0;i<n;i++){
-    /* лёгкий отступ от самих уголков (крайние точки века ненадёжны), но ряд должен доходить
-       до внешнего уголка — сильнее отступать нельзя, ресницы "обрываются" до конца глаза */
-    var t = 0.025 + 0.95 * ((i+0.5)/n);
+    var t = (i+0.5)/n;
     var base = pointAtLength(upperPts, t*total);
     var normal = norm(sub(base, lowerCenter));
     /* t=0 — внешний уголок глаза, t=1 — внутренний (порядок точек в EYE_DEFS.upper для обоих глаз).
@@ -128,29 +120,16 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
     var outerness = 1-t;
     var smooth = outerness*outerness*(3-2*outerness);
     var lenScale = 0.42+0.58*smooth;
-    /* у внешнего уголка вектор "от центра глаза" почти горизонтальный, и сильный изгиб (CC/D)
-       заваливал крайние реснички вниз за край глаза. Локально (t<0.22) правим НАПРАВЛЕНИЕ на
-       cornerDir и ослабляем подкрутку. Длину почти не трогаем, иначе ряд обрывается до уголка. */
-    var edgeFade = t < 0.22 ? (0.22 - t) / 0.22 : 0;
-    if(edgeFade > 0){
-      normal = norm(add(scl(normal, 1 - 0.68*edgeFade), scl(cornerDir, 0.68*edgeFade)));
-      lenScale *= 1 - 0.10*edgeFade;
-    }
     var fanCount = style.fanCount;
-    /* у уголка чуть сужаем веер пучка, чтобы крайние волоски не расходились */
-    var spreadDeg = fanCount>1 ? Math.min(9 + fanCount*1.4, 18) * (1 - 0.35*edgeFade) : 0;
+    var spreadDeg = fanCount>1 ? Math.min(9 + fanCount*1.4, 18) : 0;
     for(var j=0;j<fanCount;j++){
       var angleOffset = fanCount>1 ? (j-(fanCount-1)/2)/(fanCount-1)*spreadDeg : 0;
       var dir = rotateVec(normal, angleOffset);
       var perp = hookSign>=0 ? {x:-dir.y, y:dir.x} : {x:dir.y, y:-dir.x};
-      /* у внешнего уголка ось изгиба смотрит вниз-наружу — подкрутка тянет ресницу под
-         линию века. Локально слегка подмешиваем к оси изгиба "вверх по оси глаза", чтобы
-         кончик не уходил под край глаза. Плавно, зануляется на границе зоны (t=0.22). */
-      if(edgeFade > 0) perp = norm(add(scl(perp, 1 - 0.4*edgeFade), scl(eyeUp, 0.4*edgeFade)));
       var jitter = pseudoRand(i*13 + j*7);
       var lashLen = Math.max(eyeWidth*style.lengthRatio*lenScale*(0.94+0.12*jitter), minLen*lenScale);
       var bw = style.baseWidth*refScale*(0.95+0.1*pseudoRand(i*3+j*11));
-      var bendDeg = curlBend * (0.55 + 0.45*lenScale) * (1 - 0.45*edgeFade);
+      var bendDeg = curlBend * (0.55 + 0.45*lenScale);
       fillTaperedStrand(ctx, base, dir, perp, lashLen, bendDeg, bw, color);
     }
   }
@@ -448,10 +427,5 @@ function init(){
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
-
-/* отладочный хук для визуальной проверки геометрии ресниц (?tryondebug в URL); в обычном режиме не активен */
-if(typeof location !== 'undefined' && location.search.indexOf('tryondebug') >= 0){
-  window.__tryonDebug = { drawLashesOnEye: drawLashesOnEye, STYLE_DATA: STYLE_DATA, STYLE_ORDER: STYLE_ORDER, CURL_RENDER: CURL_RENDER };
-}
 
 })();
