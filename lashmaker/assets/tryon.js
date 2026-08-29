@@ -3,11 +3,11 @@
 (function(){
 
 var STYLE_DATA = {
-  classic:    { key:'classic',    label:'Классика',      hint:'Естественный эффект, 1 к 1',        density:13, fanCount:1, lengthRatio:0.28, baseWidth:1.90, opacity:0.88 },
-  hybrid:     { key:'hybrid',     label:'Гибрид',         hint:'Текстура без театральности',        density:12, fanCount:2, lengthRatio:0.34, baseWidth:1.35, opacity:0.74 },
-  volume2d3d: { key:'volume2d3d', label:'Объём 2D–3D',    hint:'Заметный, воздушный объём',         density:10, fanCount:3, lengthRatio:0.41, baseWidth:0.95, opacity:0.58 },
-  volume5d:   { key:'volume5d',   label:'Объём 5D+',      hint:'Пышные плотные пучки',               density:9,  fanCount:5, lengthRatio:0.47, baseWidth:0.80, opacity:0.52 },
-  mega:       { key:'mega',       label:'Мега объём',     hint:'Максимальная густота и драма',       density:8,  fanCount:7, lengthRatio:0.54, baseWidth:0.68, opacity:0.46 }
+  classic:    { key:'classic',    label:'Классика',      hint:'Естественный эффект, 1 к 1',        density:11, fanCount:1, lengthRatio:0.27, baseWidth:1.70, opacity:0.90 },
+  hybrid:     { key:'hybrid',     label:'Гибрид',         hint:'Текстура без театральности',        density:12, fanCount:2, lengthRatio:0.31, baseWidth:1.42, opacity:0.82 },
+  volume2d3d: { key:'volume2d3d', label:'Объём 2D–3D',    hint:'Заметный, воздушный объём',         density:13, fanCount:3, lengthRatio:0.36, baseWidth:1.22, opacity:0.74 },
+  volume5d:   { key:'volume5d',   label:'Объём 5D+',      hint:'Пышные плотные пучки',               density:14, fanCount:4, lengthRatio:0.39, baseWidth:1.08, opacity:0.70 },
+  mega:       { key:'mega',       label:'Мега объём',     hint:'Максимальная густота и драма',       density:15, fanCount:5, lengthRatio:0.43, baseWidth:0.98, opacity:0.66 }
 };
 var STYLE_ORDER = ['classic','hybrid','volume2d3d','volume5d','mega'];
 
@@ -112,23 +112,33 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
   var hookSign = (-midNormal.y*outerDir.x + midNormal.x*outerDir.y) >= 0 ? 1 : -1;
   /* не ставим волоски в самые уголки: там ресниц почти нет, а любой промах точек
      века виден как "хвост", уезжающий за пределы глаза */
-  var tLo = 0.00, tHi = 0.97;
+  var tLo = 0.015, tHi = 0.97;
   for(var i=0;i<n;i++){
     var t = tLo + (tHi - tLo) * ((i+0.5)/n);
     var base = pointAtLength(upperPts, t*total);
-    /* направление роста: смесь локальной нормали с общей нормалью глаза (55%),
-       чтобы у уголков волоски не разворачивало наружу веером */
-    var rawNormal = norm(sub(base, lowerCenter));
-    var normal = norm(add(scl(rawNormal, 0.70), scl(midNormal, 0.30)));
-    /* у внешнего уголка (t<0.28) подмешиваем наклон вдоль оси глаза — ресницы
-       тянутся к уголку и образуют "стрелку" при любом изгибе, а не торчат вертикально */
-    var wingT = clamp((0.32 - t) / 0.32, 0, 1);
-    if(wingT > 0) normal = norm(add(normal, scl(outerDir, 0.55*wingT)));
-    /* t≈0 — внешний уголок, t≈1 — внутренний. Длина плавно растёт к внешнему
-       уголку ("кошачий" эффект), но разброс небольшой — не в 2.4 раза. */
-    var outerness = 1-t;
-    var smooth = outerness*outerness*(3-2*outerness);
-    var lenScale = 0.50+0.50*smooth;
+    /* направление роста = перпендикуляр к линии ВЕКА в этой точке (по касательной),
+       а не "от центра глаза": у внешнего уголка центр глаза сильно смещён внутрь и
+       вектор "от центра" почти горизонтальный — ресница повисала крючком вбок-вниз.
+       Небольшую примесь общей нормали оставляем для устойчивости к дрожанию точек. */
+    var tanEps = Math.max(total*0.03, 1);
+    var tanA = pointAtLength(upperPts, clamp(t*total - tanEps, 0, total));
+    var tanB = pointAtLength(upperPts, clamp(t*total + tanEps, 0, total));
+    var tan = norm(sub(tanB, tanA));
+    var lidNormal = { x: tan.y, y: -tan.x };
+    if((lidNormal.x*(base.x-lowerCenter.x) + lidNormal.y*(base.y-lowerCenter.y)) < 0)
+      lidNormal = { x:-lidNormal.x, y:-lidNormal.y };
+    var normal = norm(add(scl(lidNormal, 0.80), scl(midNormal, 0.20)));
+    /* "стрелка" у внешнего уголка: подмешиваем наклон вдоль оси глаза, но окном —
+       ноль в самой угловой точке (иначе крайняя ресница повисает пучком за уголком),
+       максимум чуть внутри (t≈0.08) и плавно к нулю к t≈0.34 */
+    var wingRamp = clamp((0.34 - t) / 0.30, 0, 1) * clamp(t / 0.06, 0, 1);
+    if(wingRamp > 0) normal = norm(add(normal, scl(outerDir, 0.55*wingRamp)));
+    /* карта длин: t≈0 — внешний уголок, t≈1 — внутренний. Самые длинные ресницы
+       не в самом уголке, а во внешней трети (t≈0.30) — так и делают "кошачий" глаз.
+       В самом уголке короче, иначе ресница вылетает за край глаза. */
+    var lenScale = t < 0.30
+      ? 0.62 + 0.38 * (t / 0.30)
+      : 1.0  - 0.42 * ((t - 0.30) / 0.70);
     var fanCount = style.fanCount;
     var spreadDeg = fanCount>1 ? Math.min(7 + fanCount*1.3, 16) : 0;
     var rootStep = fanCount>1 ? (total/n)*0.20 : 0;
@@ -136,13 +146,22 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
       var jc = j-(fanCount-1)/2;
       var angleOffset = fanCount>1 ? jc/(fanCount-1)*spreadDeg : 0;
       var dir = rotateVec(normal, angleOffset);
-      var fanBase = rootStep ? pointAtLength(upperPts, clamp(t*total + jc*rootStep, 0, total)) : base;
+      var fanBase = rootStep ? pointAtLength(upperPts, clamp(t*total + jc*rootStep, tLo*total, tHi*total)) : base;
       var perp = hookSign>=0 ? {x:-dir.y, y:dir.x} : {x:dir.y, y:-dir.x};
       var jitter = pseudoRand(i*13 + j*7);
       var lashLen = Math.max(eyeWidth*style.lengthRatio*lenScale*(0.92+0.16*jitter), minLen*lenScale);
-      lashLen = Math.min(lashLen, eyeWidth*0.58);   /* мягкий потолок: режет только явные выбросы */
+      lashLen = Math.min(lashLen, eyeWidth*0.52);   /* мягкий потолок: режет только явные выбросы */
       var bw = style.baseWidth*refScale*(0.95+0.1*pseudoRand(i*3+j*11));
       var bendDeg = curlBend * (0.70 + 0.30*lenScale);
+      /* не даём кончику пересечь линию внешнего уголка (сильный изгиб D + мега уводили ресницу за глаз).
+         Разрешаем лёгкий вынос за уголок (7% ширины глаза), дальше — укорачиваем волосок, но не более чем вдвое */
+      var tipDir = rotateToward(dir, perp, bendDeg);
+      var tipProj = (tipDir.x*outerDir.x + tipDir.y*outerDir.y) * lashLen * 0.95;
+      if(tipProj > 0){
+        var baseProj = (fanBase.x-outerPt.x)*outerDir.x + (fanBase.y-outerPt.y)*outerDir.y;
+        var allow = eyeWidth*0.045;
+        if(baseProj + tipProj > allow) lashLen *= clamp((allow - baseProj) / tipProj, 0.5, 1);
+      }
       fillTaperedStrand(ctx, fanBase, dir, perp, lashLen, bendDeg, bw, color);
     }
   }
@@ -440,5 +459,10 @@ function init(){
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+
+/* отладочный хук для визуальной проверки геометрии ресниц (?tryondebug в URL); в обычном режиме не активен */
+if(typeof location !== 'undefined' && location.search.indexOf('tryondebug') >= 0){
+  window.__tryonDebug = { drawLashesOnEye: drawLashesOnEye, STYLE_DATA: STYLE_DATA, STYLE_ORDER: STYLE_ORDER, CURL_RENDER: CURL_RENDER };
+}
 
 })();
