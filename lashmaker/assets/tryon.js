@@ -120,6 +120,10 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
     var outerness = 1-t;
     var smooth = outerness*outerness*(3-2*outerness);
     var lenScale = 0.42+0.58*smooth;
+    /* Крайние 1-2 реснички у внешнего уголка делаем короче. Направление и подкрутку НЕ трогаем:
+       так у уголка нет длинной массы, которая складывалась в "клин"-стрелку и провисала на веко.
+       Всё, что дальше t≈0.15 (около 88% ряда) — без изменений. */
+    lenScale *= 0.40 + 0.60 * clamp(t/0.15, 0, 1);
     var fanCount = style.fanCount;
     var spreadDeg = fanCount>1 ? Math.min(9 + fanCount*1.4, 18) : 0;
     for(var j=0;j<fanCount;j++){
