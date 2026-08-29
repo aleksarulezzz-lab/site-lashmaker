@@ -3,11 +3,11 @@
 (function(){
 
 var STYLE_DATA = {
-  classic:    { key:'classic',    label:'Классика',      hint:'Естественный эффект, 1 к 1',        density:13, fanCount:1, lengthRatio:0.28, baseWidth:1.95, opacity:0.90 },
-  hybrid:     { key:'hybrid',     label:'Гибрид',         hint:'Текстура без театральности',        density:14, fanCount:2, lengthRatio:0.35, baseWidth:1.50, opacity:0.90 },
-  volume2d3d: { key:'volume2d3d', label:'Объём 2D–3D',    hint:'Заметный, воздушный объём',         density:15, fanCount:4, lengthRatio:0.43, baseWidth:1.15, opacity:0.92 },
-  volume5d:   { key:'volume5d',   label:'Объём 5D+',      hint:'Пышные плотные пучки',               density:14, fanCount:6, lengthRatio:0.49, baseWidth:0.95, opacity:0.93 },
-  mega:       { key:'mega',       label:'Мега объём',     hint:'Максимальная густота и драма',       density:13, fanCount:9, lengthRatio:0.56, baseWidth:0.80, opacity:0.95 }
+  classic:    { key:'classic',    label:'Классика',      hint:'Естественный эффект, 1 к 1',        density:13, fanCount:1, lengthRatio:0.28, baseWidth:1.90, opacity:0.88 },
+  hybrid:     { key:'hybrid',     label:'Гибрид',         hint:'Текстура без театральности',        density:12, fanCount:2, lengthRatio:0.34, baseWidth:1.35, opacity:0.74 },
+  volume2d3d: { key:'volume2d3d', label:'Объём 2D–3D',    hint:'Заметный, воздушный объём',         density:10, fanCount:3, lengthRatio:0.41, baseWidth:0.95, opacity:0.58 },
+  volume5d:   { key:'volume5d',   label:'Объём 5D+',      hint:'Пышные плотные пучки',               density:9,  fanCount:5, lengthRatio:0.47, baseWidth:0.80, opacity:0.52 },
+  mega:       { key:'mega',       label:'Мега объём',     hint:'Максимальная густота и драма',       density:8,  fanCount:7, lengthRatio:0.54, baseWidth:0.68, opacity:0.46 }
 };
 var STYLE_ORDER = ['classic','hybrid','volume2d3d','volume5d','mega'];
 
@@ -112,7 +112,7 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
   var hookSign = (-midNormal.y*outerDir.x + midNormal.x*outerDir.y) >= 0 ? 1 : -1;
   /* не ставим волоски в самые уголки: там ресниц почти нет, а любой промах точек
      века виден как "хвост", уезжающий за пределы глаза */
-  var tLo = 0.02, tHi = 0.97;
+  var tLo = 0.00, tHi = 0.97;
   for(var i=0;i<n;i++){
     var t = tLo + (tHi - tLo) * ((i+0.5)/n);
     var base = pointAtLength(upperPts, t*total);
@@ -122,25 +122,28 @@ function drawLashesOnEye(ctx, upperPts, lowerCenter, outerPt, innerPt, style, cu
     var normal = norm(add(scl(rawNormal, 0.70), scl(midNormal, 0.30)));
     /* у внешнего уголка (t<0.28) подмешиваем наклон вдоль оси глаза — ресницы
        тянутся к уголку и образуют "стрелку" при любом изгибе, а не торчат вертикально */
-    var wingT = clamp((0.28 - t) / 0.28, 0, 1);
-    if(wingT > 0) normal = norm(add(normal, scl(outerDir, 0.42*wingT)));
+    var wingT = clamp((0.32 - t) / 0.32, 0, 1);
+    if(wingT > 0) normal = norm(add(normal, scl(outerDir, 0.55*wingT)));
     /* t≈0 — внешний уголок, t≈1 — внутренний. Длина плавно растёт к внешнему
        уголку ("кошачий" эффект), но разброс небольшой — не в 2.4 раза. */
     var outerness = 1-t;
     var smooth = outerness*outerness*(3-2*outerness);
     var lenScale = 0.50+0.50*smooth;
     var fanCount = style.fanCount;
-    var spreadDeg = fanCount>1 ? Math.min(8 + fanCount*1.5, 24) : 0;
+    var spreadDeg = fanCount>1 ? Math.min(7 + fanCount*1.3, 16) : 0;
+    var rootStep = fanCount>1 ? (total/n)*0.20 : 0;
     for(var j=0;j<fanCount;j++){
-      var angleOffset = fanCount>1 ? (j-(fanCount-1)/2)/(fanCount-1)*spreadDeg : 0;
+      var jc = j-(fanCount-1)/2;
+      var angleOffset = fanCount>1 ? jc/(fanCount-1)*spreadDeg : 0;
       var dir = rotateVec(normal, angleOffset);
+      var fanBase = rootStep ? pointAtLength(upperPts, clamp(t*total + jc*rootStep, 0, total)) : base;
       var perp = hookSign>=0 ? {x:-dir.y, y:dir.x} : {x:dir.y, y:-dir.x};
       var jitter = pseudoRand(i*13 + j*7);
       var lashLen = Math.max(eyeWidth*style.lengthRatio*lenScale*(0.92+0.16*jitter), minLen*lenScale);
       lashLen = Math.min(lashLen, eyeWidth*0.58);   /* мягкий потолок: режет только явные выбросы */
       var bw = style.baseWidth*refScale*(0.95+0.1*pseudoRand(i*3+j*11));
       var bendDeg = curlBend * (0.70 + 0.30*lenScale);
-      fillTaperedStrand(ctx, base, dir, perp, lashLen, bendDeg, bw, color);
+      fillTaperedStrand(ctx, fanBase, dir, perp, lashLen, bendDeg, bw, color);
     }
   }
 }
