@@ -5,5 +5,6 @@ Allow: /
 Disallow: /lashmaker/variant-
 Disallow: /lashmaker/preview.html
 Disallow: /lashmaker/design-history.html
+Disallow: /lashmaker/index-video-hero.html
 
 Sitemap: https://aleksarulezzz.ru/sitemap.xml
