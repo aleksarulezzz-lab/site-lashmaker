@@ -203,16 +203,19 @@ test('a stale date button from an old message cannot create a past-dated booking
   await handleMessage(env, { chat: { id: 111 }, text: '/start' });
   await handleMessage(env, { chat: { id: 111 }, text: '/book' });
 
+  sentMessages.length = 0;
   await handleCallbackQuery(env, { id: 'cb1', message: { chat: { id: 111 } }, data: 'bd:2020-01-06' });
+  assert.match(sentMessages[sentMessages.length - 1].text, /уже прошла/);
+  assert.equal(dbState.sessions.has(111), false);
+
+  // any further taps on the stale keyboard lead nowhere
   await handleCallbackQuery(env, { id: 'cb2', message: { chat: { id: 111 } }, data: 'bs:2020-01-06:0' });
   await handleMessage(env, { chat: { id: 111 }, text: 'Мария' });
   await handleMessage(env, { chat: { id: 111 }, text: '+79991112233' });
-  sentMessages.length = 0;
   await handleMessage(env, { chat: { id: 111 }, text: 'Классика' });
 
   assert.equal(dbState.bookings.length, 0);
   assert.equal(dbState.sessions.has(111), false);
-  assert.match(sentMessages[0].text, /уже прошла/);
 });
 
 test('an interrupting command clears a mid-flow /book session so later free text is not swallowed', async () => {

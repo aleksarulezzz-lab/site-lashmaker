@@ -1,4 +1,4 @@
-import { isValidDateFormat, isValidSlotTime, isWorkingDay, getTodayMoscow, addDays, FIXED_SLOTS } from './slots.js';
+import { isValidDateFormat, isValidSlotTime, isWorkingDay, getTodayMoscow, addDays, FIXED_SLOTS, hasSlotPassed } from './slots.js';
 import { getBookedSlotsInRange, createBooking, getAdminChatId, deleteBookingsBefore } from './db.js';
 import { sendMessage, escapeHtml } from './telegram.js';
 import { handleTelegramUpdate } from './bot.js';
@@ -71,7 +71,9 @@ async function handleAvailability(request, env, cors) {
       date: cursor,
       working,
       slots: working
-        ? FIXED_SLOTS.map(t => ({ time: t, free: !booked.has(`${cursor}|${t}`) }))
+        ? FIXED_SLOTS
+            .filter(t => !hasSlotPassed(cursor, t))   // день в день не показываем уже прошедшее время
+            .map(t => ({ time: t, free: !booked.has(`${cursor}|${t}`) }))
         : []
     });
     const d = new Date(cursor + 'T00:00:00Z');
@@ -106,6 +108,9 @@ async function handleBook(request, env, cors) {
   }
   if (!isValidSlotTime(slot_time)) {
     return json({ error: 'invalid_slot' }, 400, cors);
+  }
+  if (hasSlotPassed(date, slot_time)) {
+    return json({ error: 'slot_past' }, 400, cors);
   }
   if (!client_name || String(client_name).trim().length < 2 || String(client_name).length > 100) {
     return json({ error: 'invalid_name' }, 400, cors);

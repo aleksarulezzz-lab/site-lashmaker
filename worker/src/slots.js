@@ -57,6 +57,14 @@ export function appointmentInstantUtcMs(dateStr, slotTime) {
   return Date.parse(`${dateStr}T${slotTime}:00Z`) - MOSCOW_OFFSET_MS;
 }
 
+// Записываться день в день на уже наступившее (или начинающееся совсем скоро)
+// время нельзя. Грейс-период — чтобы не бронировали слот, который вот-вот начнётся.
+export const SLOT_BOOKING_GRACE_MS = 30 * 60 * 1000;
+
+export function hasSlotPassed(dateStr, slotTime, nowMs = Date.now(), graceMs = SLOT_BOOKING_GRACE_MS) {
+  return appointmentInstantUtcMs(dateStr, slotTime) <= nowMs + graceMs;
+}
+
 export function isDueForReminder(booking, nowMs, leadMs, windowMs) {
   const dueAt = appointmentInstantUtcMs(booking.date, booking.slot_time) - leadMs;
   return nowMs >= dueAt && nowMs < dueAt + windowMs;

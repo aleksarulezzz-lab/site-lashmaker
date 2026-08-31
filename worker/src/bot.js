@@ -1,6 +1,6 @@
 import {
   FIXED_SLOTS, isValidDateFormat, getTodayMoscow, getTomorrowMoscow,
-  nextWorkingDays, formatDateLabel
+  nextWorkingDays, formatDateLabel, hasSlotPassed
 } from './slots.js';
 import { buildDailyReport } from './dailyReport.js';
 import {
@@ -42,7 +42,7 @@ async function startBookFlow(env, chatId) {
   const to = candidates[candidates.length - 1];
   const booked = await getBookedSlotsInRange(env.DB, from, to);
   const withFreeSlot = candidates
-    .filter(date => FIXED_SLOTS.some(t => !booked.has(`${date}|${t}`)))
+    .filter(date => FIXED_SLOTS.some(t => !booked.has(`${date}|${t}`) && !hasSlotPassed(date, t)))
     .slice(0, 10);
   if (withFreeSlot.length === 0) {
     await sendMessage(env, chatId, 'Свободных дат в ближайшее время нет.');
@@ -183,12 +183,19 @@ export async function handleCallbackQuery(env, callbackQuery) {
       await answerCallbackQuery(env, callbackQuery.id, 'Сессия истекла, наберите /book');
       return;
     }
+    if (date < getTodayMoscow()) {
+      await clearSession(env.DB, chatId);
+      await answerCallbackQuery(env, callbackQuery.id);
+      await sendMessage(env, chatId, 'Эта дата уже прошла (кнопка была из старого сообщения). Начните заново: /book');
+      return;
+    }
     const booked = await getBookedSlotsInRange(env.DB, date, date);
-    const free = FIXED_SLOTS.filter(t => !booked.has(`${date}|${t}`));
+    // день в день не предлагаем уже прошедшее время
+    const free = FIXED_SLOTS.filter(t => !booked.has(`${date}|${t}`) && !hasSlotPassed(date, t));
     if (free.length === 0) {
       await clearSession(env.DB, chatId);
       await answerCallbackQuery(env, callbackQuery.id);
-      await sendMessage(env, chatId, 'День уже полностью занят. Наберите /book, чтобы выбрать другую дату.');
+      await sendMessage(env, chatId, 'На эту дату свободного времени уже нет. Наберите /book, чтобы выбрать другую дату.');
       return;
     }
     const rows = free.map(t => {
@@ -214,6 +221,12 @@ export async function handleCallbackQuery(env, callbackQuery) {
       await clearSession(env.DB, chatId);
       await answerCallbackQuery(env, callbackQuery.id, 'Этот слот уже заняли');
       await sendMessage(env, chatId, 'Этот слот уже заняли, начните заново: /book');
+      return;
+    }
+    if (hasSlotPassed(date, slot_time)) {
+      await clearSession(env.DB, chatId);
+      await answerCallbackQuery(env, callbackQuery.id, 'Это время уже прошло');
+      await sendMessage(env, chatId, 'Это время уже прошло, начните заново: /book');
       return;
     }
     await setSession(env.DB, chatId, 'await_name', { date, slot_time });
