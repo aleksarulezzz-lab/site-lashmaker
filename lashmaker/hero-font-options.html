@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Шрифт главного экрана — 5 вариантов · Александра Рулева</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Prata&family=Lora:ital,wght@1,500;0,600&family=Cormorant:wght@600;700&family=Cormorant+Garamond:ital,wght@1,300&family=Forum&family=Manrope:wght@400;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0c0806; --surface:#160f0a; --ink:#f4e9d6; --ink-soft:#b3a084;
+    --accent:#c9a24a; --accent-strong:#e8c876; --border:#332419;
+    --body:'Manrope',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(60% 40% at 22% 12%, rgba(201,162,74,.16), transparent 60%),
+      radial-gradient(50% 45% at 85% 80%, rgba(122,90,36,.20), transparent 60%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:64px 28px 120px;}
+  .lead{max-width:640px;margin-bottom:16px;}
+  .lead h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin:0 0 10px;}
+  .lead p{color:var(--ink-soft);font-size:14.5px;margin:0;}
+  .note{font-size:12.5px;color:var(--ink-soft);margin:14px 0 40px;padding:12px 16px;border:1px solid var(--border);background:var(--surface);}
+  .opt{border-top:1px solid var(--border);padding:42px 0 38px;}
+  .opt:last-child{border-bottom:1px solid var(--border);}
+  .opt-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:26px;}
+  .opt-num{font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);width:26px;flex-shrink:0;}
+  .opt-name{font-weight:700;font-size:15px;letter-spacing:.02em;}
+  .opt-why{color:var(--ink-soft);font-size:13.5px;flex:1;min-width:240px;}
+  .opt-tag{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-strong);border:1px solid var(--border);padding:4px 9px;border-radius:100px;}
+  .sample{
+    font-size:clamp(44px,7vw,92px);line-height:1.1;
+    background:linear-gradient(115deg,#c9a24a 0%,#e8c876 16%,#f6dfa0 38%,#fff8e4 50%,#f6dfa0 62%,#e8c876 84%,#c9a24a 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 1px 1px rgba(0,0,0,.35);
+    display:inline-block;
+  }
+  .sample-sub{font-size:14px;color:var(--ink-soft);margin-top:14px;font-family:var(--body);}
+
+  /* --- the 5 candidates --- */
+  .f-current{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;}
+  .f-playfair{font-family:'Playfair Display',serif;font-weight:700;font-style:italic;letter-spacing:-.01em;}
+  .f-prata{font-family:'Prata',serif;font-weight:400;letter-spacing:.005em;}
+  .f-lora{font-family:'Lora',serif;font-style:italic;font-weight:500;}
+  .f-cormorant{font-family:'Cormorant',serif;font-weight:600;letter-spacing:.005em;}
+  .f-forum{font-family:'Forum',serif;font-weight:400;letter-spacing:.02em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lead">
+    <h1>Шрифт имени на главном экране</h1>
+    <p>Пять вариантов на замену текущему. Все — с кириллицей, с Google Fonts (проходят по CSP сайта). Показаны тем же золотым градиентом и размером, что в герое.</p>
+  </div>
+  <div class="note">Сейчас стоит <b>Cormorant Garamond Italic 300</b> — тонкий каллиграфический курсив. Претензия: спичечно-тонкий, мало «веса», похож на дефолтную антикву.</div>
+
+  <div class="opt">
+    <div class="opt-head">
+      <span class="opt-num">00</span>
+      <span class="opt-name">Cormorant Garamond Italic — сейчас</span>
+      <span class="opt-why">Для сравнения: то, что стоит на сайте прямо сейчас.</span>
+      <span class="opt-tag">текущий</span>
+    </div>
+    <div class="sample f-current">Александра Рулева</div>
+  </div>
+
+  <div class="opt">
+    <div class="opt-head">
+      <span class="opt-num">01</span>
+      <span class="opt-name">Playfair Display Italic 700</span>
+      <span class="opt-why">Тот же шрифт, что в заголовках секций, но крупно и курсивом. Высокий контраст штриха, драма, вся страница звучит одним голосом. Самый «журнальный люкс».</span>
+      <span class="opt-tag">рекомендую</span>
+    </div>
+    <div class="sample f-playfair">Александра Рулева</div>
+    <div class="sample-sub">Плюс: единство с заголовками. Минус: Playfair сейчас очень часто используют.</div>
+  </div>
+
+  <div class="opt">
+    <div class="opt-head">
+      <span class="opt-num">02</span>
+      <span class="opt-name">Prata</span>
+      <span class="opt-why">Дидон-антиква из мира глянца (Vogue-подобная). Одно начертание, прямое, тонко-толстый контраст. Дорого и по-бьюти, без курсивной «рукописности».</span>
+      <span class="opt-tag">фаворит для бьюти</span>
+    </div>
+    <div class="sample f-prata">Александра Рулева</div>
+    <div class="sample-sub">Плюс: сразу читается как парфюм/косметика. Минус: только один вес, прямое (не курсив).</div>
+  </div>
+
+  <div class="opt">
+    <div class="opt-head">
+      <span class="opt-num">03</span>
+      <span class="opt-name">Lora Italic 500</span>
+      <span class="opt-why">Тёплый каллиграфический курсив — как сейчас по настроению, но с телом и плотностью. Не спичечный, читается мягко и уверенно.</span>
+      <span class="opt-tag">эволюция текущего</span>
+    </div>
+    <div class="sample f-lora">Александра Рулева</div>
+    <div class="sample-sub">Плюс: сохраняет нынешний «рукописно-элегантный» вайб, но крепче. Минус: менее «острый», чем Дидон.</div>
+  </div>
+
+  <div class="opt">
+    <div class="opt-head">
+      <span class="opt-num">04</span>
+      <span class="opt-name">Cormorant 600 (прямой, не Garamond)</span>
+      <span class="opt-why">Та же семья, но более плотный вес и прямое начертание. Убирает «тонкость» текущего, оставляя ту же аристократичную антикву.</span>
+      <span class="opt-tag">минимальная правка</span>
+    </div>
+    <div class="sample f-cormorant">Александра Рулева</div>
+    <div class="sample-sub">Плюс: почти не меняет характер, только добавляет веса. Минус: всё ещё «антиква по умолчанию» для многих.</div>
+  </div>
+
+  <div class="opt">
+    <div class="opt-head">
+      <span class="opt-num">05</span>
+      <span class="opt-name">Forum</span>
+      <span class="opt-why">Римская капитель-антиква, как гравировка на монограмме или флаконе духов. Спокойные широкие буквы, отличная кириллица, редко встречается.</span>
+      <span class="opt-tag">характерный, не дефолт</span>
+    </div>
+    <div class="sample f-forum">Александра Рулева</div>
+    <div class="sample-sub">Плюс: самобытный, «выгравированный». Минус: один вес; крупный курсивной альтернативы нет.</div>
+  </div>
+
+  <p style="margin-top:48px;color:var(--ink-soft);font-size:13.5px;max-width:640px;">
+    Мой порядок: <b style="color:var(--ink)">Prata</b> (самый «бьюти») → <b style="color:var(--ink)">Playfair Display Italic</b> (единство с сайтом) → <b style="color:var(--ink)">Lora Italic</b> (бережная замена). Скажи номер — поставлю на копию сайта.
+  </p>
+</div>
+</body>
+</html>

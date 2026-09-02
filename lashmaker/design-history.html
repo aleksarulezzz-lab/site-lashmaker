@@ -67,6 +67,12 @@
   .r7c4 .sw1{background:#0a0a0a;} .r7c4 .sw2{background:#ff2d3f;} .r7c4 .sw3{background:#ff5a68;}
   .r7c5 .sw1{background:#f7f4ef;} .r7c5 .sw2{background:#17110f;} .r7c5 .sw3{background:#c8102e;}
   .tag-bwr{background:rgba(229,9,20,.16);color:#ff8f98;}
+  /* round 8 swatches (interaction prototypes — warm-black + gold) */
+  .r8c1 .sw1{background:#c9a24a;} .r8c1 .sw2{background:#0c0806;} .r8c1 .sw3{background:#fff8e4;}
+  .r8c3 .sw1{background:#c9a24a;} .r8c3 .sw2{background:#1a130d;} .r8c3 .sw3{background:#7a5a24;}
+  .tag-proto{background:rgba(201,162,74,.18);color:#e8c876;}
+  .r9c1 .sw1{background:#c9a24a;} .r9c1 .sw2{background:#0c0806;} .r9c1 .sw3{background:#fff8e4;}
+  .tag-copy{background:rgba(232,200,118,.22);color:#fff2d4;}
 
   @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:600px){.cards{grid-template-columns:1fr;}}
@@ -359,6 +365,44 @@
         <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
         <h3>Écarlate Papier</h3>
         <p>Тёплая кремовая бумага, глубокий алый акцент. Ближе всех к текущей структуре: сохранены рисованные завитки и узор, просто перекрашены в алый.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 8 — прототипы взаимодействия (по разбору референсов)</h2>
+      <span class="date">создано восьмым</span>
+    </div>
+    <p class="round-note">Прототипы на базе рабочей версии сайта: контент, токены (тёплый чёрный #0c0806 + золото #c9a24a) и блоки взяты как есть, каждый отрабатывает один приём из разбора «вау»-референсов (Framer, Shopify Editions, recent.design, topology.vc и др.). Не варианты палитры — тесты механики. Тема только тёмная, всё с фолбэком и учётом «уменьшить движение». (Прототип с закреплёнными главами отклонён.)</p>
+    <div class="cards">
+      <a class="card r8c1" href="proto-silk-caustics.html">
+        <span class="tag tag-proto">✦ шёлк фоном + слои</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Шёлк фоном всего сайта</h3>
+        <p>WebGL-шёлк закреплён за всей страницей и всегда живёт. Секции чередуются: прозрачные (герой, цитата, отзывы) — шёлк просвечивает, контент дрейфует параллаксом; плотные панели (услуги, изгибы, запись) — при скролле наезжают на шёлк и отбрасывают тень. Три плана глубины.</p>
+      </a>
+      <a class="card r8c3" href="proto-scatter.html">
+        <span class="tag tag-proto">✦ орбита · стоп на ховере</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Орбита работ</h3>
+        <p>Карточки сами плывут по плавной эллиптической орбите поверх живого шёлка — без прокрутки. Передние крупнее и резче, дальние в расфокусе (перспектива). Наведёшь на галерею — поток замирает, карточка выходит в центр и выпрямляется, чтобы её прочитать.</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="round">
+    <div class="round-head">
+      <h2>Раунд 9 — копия рабочего сайта с атлас-фоном</h2>
+      <span class="date">создано девятым</span>
+    </div>
+    <p class="round-note">Полная копия рабочей страницы (весь контент и вся логика — тест, примерочная, гид по изгибам, запись, темы), поверх которой применены эффекты из Раунда 8: WebGL-шёлк фоном всей страницы, чередование прозрачных и плотных секций с эффектом глубины, портфолио превращено в орбиту с настоящими фото. Рабочий index.html не тронут. Если направление верное — переносим на него.</p>
+    <div class="cards">
+      <a class="card r9c1" href="index-atlas.html">
+        <span class="tag tag-copy">★ копия сайта</span>
+        <div class="swatch"><span class="sw1"></span><span class="sw2"></span><span class="sw3"></span></div>
+        <h3>Атлас-фон + слои глубины</h3>
+        <p>Шёлк закреплён за всей страницей (тёмная тема), секции чередуются open / panel: прозрачные показывают шёлк и дрейфуют параллаксом, плотные наезжают сверху и отбрасывают тень. Портфолио → орбита из реальных фото работ: сами плывут, наведение останавливает поток и подсвечивает карточку, остальные уходят в тень. Светлая тема — штатный фон без шёлка. Вся интерактивность рабочего сайта сохранена.</p>
       </a>
     </div>
   </div>

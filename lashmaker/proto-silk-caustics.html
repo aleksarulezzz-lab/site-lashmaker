@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Прототип · Шёлк фоном всего сайта + слои глубины · Александра Рулева</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Прототип lashmaker: WebGL-шёлк как фон всей страницы; секции чередуются — прозрачные (шёлк просвечивает) и на плотном фоне, которые при скролле наезжают на шёлк и отбрасывают тень. Три плана глубины.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Cormorant+Garamond:ital,wght@0,500;1,300;1,500&family=Manrope:wght@300;400;600;700;800&display=swap">
+<style>
+  :root{
+    --bg:#0c0806; --bg-soft:#140e09; --surface:#1a130d;
+    --ink:#f4e9d6; --ink-soft:#b3a084;
+    --accent:#c9a24a; --accent-strong:#e8c876; --accent-2:#7a5a24;
+    --border:#332419;
+    --shadow-md:0 20px 44px -20px rgba(0,0,0,.7);
+    --shadow-lg:0 34px 80px -28px rgba(0,0,0,.8),0 0 0 1px rgba(201,162,74,.1);
+    --glow:0 0 70px -12px rgba(201,162,74,.4);
+    --font-head:'Playfair Display',serif;
+    --font-script:'Cormorant Garamond',serif;
+    --font-body:'Manrope',sans-serif;
+    --header-bg:rgba(20,15,9,.5);
+    --header-border:rgba(201,162,74,.22);
+    /* cast shadow that lifts a solid panel off the silk behind it */
+    --panel-lift:0 -26px 55px -10px rgba(0,0,0,.6), 0 26px 55px -10px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#0c0806;color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  body::before{ /* grain over everything, above the silk */
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;margin:0 0 .5em;}
+  p{margin:0 0 1em;}
+
+  /* ---------- the silk, fixed behind the whole page ---------- */
+  #silk{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;}
+  .silk-fallback{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(80% 60% at 32% 34%, rgba(201,162,74,.20), transparent 60%),
+      repeating-linear-gradient(118deg, rgba(0,0,0,.5) 0 40px, rgba(30,20,10,.12) 40px 82px, rgba(0,0,0,.46) 82px 122px),
+      linear-gradient(155deg,#0c0806,#180f09 48%,#0c0806 100%);
+  }
+
+  .page{position:relative;z-index:1;}
+  .container{max-width:1180px;margin:0 auto;padding:0 24px;position:relative;}
+
+  .eyebrow{
+    display:inline-block;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:22px;font-family:var(--font-script);font-style:italic;font-size:15px;
+  }
+  .eyebrow::before,.eyebrow::after{
+    content:'';width:22px;height:11px;display:inline-block;vertical-align:middle;margin:0 8px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 20'><path d='M2,10 C9,10 9,4 16,4 C23,4 23,16 30,16 C37,16 37,10 46,10' fill='none' stroke='%23c9a24a' stroke-width='2.4' stroke-linecap='round'/><circle cx='24' cy='10' r='2.4' fill='%23c9a24a'/></svg>");
+    background-repeat:no-repeat;background-size:contain;background-position:center;
+  }
+  .eyebrow::before{margin-left:0;} .eyebrow::after{margin-right:0;transform:scaleX(-1);}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:17px 34px;
+    font-family:var(--font-body);font-weight:700;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    cursor:pointer;border:1px solid transparent;text-decoration:none;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s ease;
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--accent-strong),var(--accent) 60%,var(--accent-2));color:#1a1006;box-shadow:var(--shadow-md);border:none;}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg),var(--glow);}
+  .btn-outline{background:rgba(12,8,6,.35);border-color:var(--accent-2);color:var(--accent);backdrop-filter:blur(2px);}
+  .btn-outline:hover{border-color:var(--accent);background:rgba(201,162,74,.1);}
+
+  header.site-header{
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;width:calc(100% - 40px);max-width:1040px;
+    background:var(--header-bg);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+    border:1px solid var(--header-border);border-radius:100px;box-shadow:0 20px 50px -20px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .header-inner{display:flex;align-items:center;justify-content:space-between;padding:10px 10px 10px 14px;gap:14px;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--font-head);font-size:17px;font-weight:800;letter-spacing:.05em;}
+  .logo-mark{width:32px;height:32px;border-radius:50%;border:1px solid rgba(201,162,74,.4);display:flex;align-items:center;justify-content:center;font-family:var(--font-script);font-style:italic;color:var(--accent);font-size:15px;}
+  .logo span{color:var(--accent);}
+  nav.nav{display:flex;align-items:center;gap:13px;}
+  nav.nav a{font-size:11.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;text-decoration:none;color:var(--ink-soft);padding:4px 0;}
+  nav.nav a:hover{color:var(--accent);}
+  .header-actions .btn-primary{padding:13px 24px;border-radius:100px;white-space:nowrap;}
+  @media(max-width:900px){ nav.nav{display:none;} }
+
+  /* ---------- section planes ---------- */
+  .sec{position:relative;}
+  /* OPEN plane: transparent, silk shows through. content parallax-drifts (mid plane). */
+  .sec-open{background:transparent;padding:clamp(90px,13vw,150px) 0;}
+  .sec-open > .scrim{
+    position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(64% 54% at 50% 50%, rgba(10,7,5,.74), rgba(10,7,5,.28) 62%, transparent 86%);
+  }
+  .sec-open > .inner{position:relative;z-index:1;will-change:transform;}
+  /* PANEL plane: opaque, covers the silk on scroll, casts a shadow onto it (near plane). */
+  .sec-panel{
+    position:relative;z-index:2;background:var(--bg);
+    box-shadow:var(--panel-lift);
+    border-top:1px solid rgba(232,200,118,.12);
+    border-bottom:1px solid rgba(0,0,0,.5);
+    padding:clamp(80px,11vw,120px) 0;
+  }
+  .sec-panel.alt{background:var(--surface);}
+  .sec-panel > .inner > *{will-change:transform,opacity;}
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1);}
+  .reveal.is-visible{opacity:1;transform:none;}
+
+  .sec-head{max-width:640px;margin:0 auto 56px;text-align:center;}
+  .sec-head h2{font-size:clamp(32px,4.2vw,48px);color:var(--ink);}
+  .sec-head p{color:var(--ink-soft);font-size:19px;font-family:var(--font-script);}
+
+  /* ---------- hero (open) ---------- */
+  .hero{min-height:100svh;display:flex;align-items:center;padding:150px 0 90px;}
+  .hero .scrim{background:linear-gradient(100deg, rgba(10,7,5,.8) 0%, rgba(10,7,5,.44) 42%, transparent 72%);}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;}
+  .hero h1{
+    font-size:clamp(48px,7.2vw,100px);font-weight:300;font-style:italic;font-family:var(--font-script);
+    line-height:1.12;margin:0;color:#fff9f0;text-shadow:0 4px 44px rgba(0,0,0,.6),0 1px 2px rgba(0,0,0,.55);
+  }
+  .hero .lead{
+    font-size:clamp(18px,2.3vw,22px);line-height:1.55;color:#efe2c9;max-width:500px;margin:24px 0 0;
+    font-family:var(--font-script);text-shadow:0 2px 20px rgba(0,0,0,.65);
+  }
+  .hero-cta{display:flex;gap:16px;margin-top:36px;flex-wrap:wrap;}
+  .hero-stats{display:flex;gap:42px;margin-top:52px;flex-wrap:wrap;}
+  .hero-stats b{display:block;font-family:var(--font-head);font-size:29px;color:var(--accent-strong);}
+  .hero-stats span{font-size:11.5px;color:#d9c8ab;text-transform:uppercase;letter-spacing:.08em;}
+  .hero-portrait{position:relative;width:100%;height:clamp(400px,42vw,580px);}
+  .hero-portrait::before{
+    content:'';position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:112%;height:112%;border-radius:50%;
+    background:radial-gradient(circle, rgba(201,162,74,.28), transparent 66%);filter:blur(44px);z-index:-1;
+  }
+  .hero-portrait img{
+    width:100%;height:100%;object-fit:contain;object-position:center bottom;
+    filter:drop-shadow(0 40px 60px rgba(0,0,0,.55)) saturate(1.04) contrast(1.04);
+    -webkit-mask-image:linear-gradient(to bottom,#000 92%,transparent 100%);
+            mask-image:linear-gradient(to bottom,#000 92%,transparent 100%);
+    transform:scaleX(-1);
+  }
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:1fr;text-align:center;}
+    .hero-cta,.hero-stats{justify-content:center;}
+    .hero .lead{margin-inline:auto;}
+    .hero-portrait{display:none;}
+  }
+
+  /* ---------- services (panel) ---------- */
+  .services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px;}
+  .service-card{background:var(--bg-soft);border:1px solid var(--border);padding:38px;transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s ease,border-color .35s ease;}
+  .service-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--accent-2);}
+  .service-card h3{font-size:23px;color:var(--accent);}
+  .service-row{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px dashed var(--border);font-size:14.5px;}
+  .service-row:last-of-type{border-bottom:none;}
+  .service-row span:last-child{color:var(--accent);font-weight:700;white-space:nowrap;font-family:var(--font-head);}
+  .service-note{margin-top:18px;font-size:15px;line-height:1.5;color:var(--ink-soft);font-family:var(--font-script);}
+  @media(max-width:820px){ .services-grid{grid-template-columns:1fr;} }
+
+  /* ---------- manifesto (open) ---------- */
+  .manifesto{text-align:center;}
+  .manifesto blockquote{
+    margin:0;max-width:900px;margin-inline:auto;
+    font-family:var(--font-script);font-style:italic;font-weight:300;
+    font-size:clamp(26px,4.4vw,52px);line-height:1.28;color:#fff9f0;
+    text-shadow:0 3px 30px rgba(0,0,0,.7);
+  }
+  .manifesto blockquote b{font-weight:500;color:var(--accent-strong);font-style:normal;}
+  .manifesto cite{display:block;margin-top:26px;font-family:var(--font-body);font-style:normal;font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:#e0cfae;}
+
+  /* ---------- curls (panel alt) ---------- */
+  .curls-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:34px;}
+  .curl-chip{
+    display:flex;flex-direction:column;align-items:center;gap:6px;min-width:96px;padding:18px 20px;
+    border:1px solid var(--border);background:var(--bg-soft);
+  }
+  .curl-chip b{font-family:var(--font-head);font-size:26px;color:var(--accent);}
+  .curl-chip span{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+  .curls-desc{max-width:620px;margin:0 auto;text-align:center;color:var(--ink-soft);font-family:var(--font-script);font-size:19px;}
+
+  /* ---------- reviews (open) — cards float on the silk ---------- */
+  .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .review-card{background:rgba(20,14,9,.86);backdrop-filter:blur(3px);border:1px solid var(--border);padding:30px;box-shadow:var(--shadow-md);}
+  .review-card .stars{color:var(--accent);letter-spacing:3px;font-size:14px;margin-bottom:12px;}
+  .review-card p{font-family:var(--font-script);font-size:18px;line-height:1.5;color:var(--ink);margin:0 0 16px;}
+  .review-card .who{display:flex;align-items:center;gap:11px;}
+  .review-card .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));flex-shrink:0;}
+  .review-card .who b{display:block;font-family:var(--font-body);font-size:13px;}
+  .review-card .who span{font-size:11px;color:var(--ink-soft);}
+  @media(max-width:900px){ .reviews-grid{grid-template-columns:1fr;} }
+
+  /* ---------- booking (panel) ---------- */
+  .booking{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;}
+  .booking h2{font-size:clamp(28px,3.6vw,42px);color:var(--ink);}
+  .booking p{color:var(--ink-soft);font-family:var(--font-script);font-size:19px;max-width:440px;}
+  .booking ul{list-style:none;padding:0;margin:24px 0 0;}
+  .booking li{padding:12px 0;border-top:1px solid var(--border);font-size:14px;color:var(--ink-soft);}
+  .booking li:first-child{border-top:none;}
+  .booking-cta{display:flex;flex-direction:column;gap:14px;padding:36px;border:1px solid var(--border);background:var(--bg-soft);}
+  .booking-cta .btn{width:100%;}
+  @media(max-width:820px){ .booking{grid-template-columns:1fr;} }
+
+  footer{position:relative;z-index:2;background:var(--bg);border-top:1px solid var(--border);padding:46px 0;text-align:center;color:var(--ink-soft);font-size:12.5px;box-shadow:var(--panel-lift);}
+  footer b{color:var(--accent);font-family:var(--font-head);}
+
+  .proto-note{max-width:760px;margin:0 auto;padding:22px 26px;border:1px solid var(--border);background:var(--bg-soft);font-size:13.5px;color:var(--ink-soft);line-height:1.6;}
+  .proto-note b{color:var(--accent);font-family:var(--font-head);}
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+    #silk{display:none;}
+    .sec-open > .inner{transform:none!important;}
+    .reveal{opacity:1;transform:none;}
+  }
+  a:focus-visible,button:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px;}
+</style>
+</head>
+<body>
+<canvas id="silk" aria-hidden="true"></canvas>
+<div class="silk-fallback" aria-hidden="true" hidden></div>
+
+<div class="page">
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">А</span> Александра <span>Рулева</span></div>
+    <nav class="nav">
+      <a href="#services">Услуги</a>
+      <a href="#curls">Изгибы</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#booking">Запись</a>
+    </nav>
+    <div class="header-actions"><a href="#booking" class="btn btn-primary">Записаться</a></div>
+  </div>
+</header>
+
+<main>
+<!-- 1 · HERO — open, on the silk -->
+<section class="sec sec-open hero" id="top">
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="container inner">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">Наращивание · Ламинирование ресниц</span>
+        <h1>Александра Рулева</h1>
+        <p class="lead">Мастер по наращиванию и ламинированию ресниц. Барочная роскошь и внимание к каждой детали ради взгляда, достойного восхищения.</p>
+        <div class="hero-cta">
+          <a href="#reviews" class="btn btn-primary">Смотреть работы</a>
+          <a href="#booking" class="btn btn-outline">Записаться ко мне</a>
+        </div>
+        <div class="hero-stats">
+          <div><b>6 лет</b><span>в мастерстве</span></div>
+          <div><b>2400+</b><span>клиенток</span></div>
+          <div><b>4.9</b><span>рейтинг</span></div>
+        </div>
+      </div>
+      <div class="hero-portrait" aria-hidden="true">
+        <img src="assets/photos/alexandra-hero-2.webp" alt="Александра Рулева" width="1000" height="1341" decoding="async" loading="eager">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · SERVICES — solid panel, covers the silk -->
+<section class="sec sec-panel" id="services">
+  <div class="container inner">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Услуги и цены</span>
+      <h2>Мой прайс-лист</h2>
+      <p>Итоговая стоимость зависит от густоты натуральных ресниц и выбранного эффекта.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <h3>Наращивание ресниц</h3>
+        <div class="service-row"><span>Классическое (1D)</span><span>от 2 200 ₽</span></div>
+        <div class="service-row"><span>Голливудское 2D</span><span>от 2 600 ₽</span></div>
+        <div class="service-row"><span>Объёмное 3D–5D</span><span>от 2 900 ₽</span></div>
+        <div class="service-row"><span>Мега объём / Wet-эффект</span><span>от 3 400 ₽</span></div>
+        <p class="service-note">В стоимость входит консультация по изгибу и длине.</p>
+      </div>
+      <div class="service-card reveal">
+        <h3>Ламинирование</h3>
+        <div class="service-row"><span>Ламинирование + ботокс + окрашивание</span><span>от 2 800 ₽</span></div>
+        <div class="service-row"><span>Ламинирование ресниц и бровей</span><span>от 3 900 ₽</span></div>
+        <div class="service-row"><span>Ламинирование бровей</span><span>от 1 800 ₽</span></div>
+        <p class="service-note">Эффект держится 4–6 недель.</p>
+      </div>
+      <div class="service-card reveal">
+        <h3>Коррекция и снятие</h3>
+        <div class="service-row"><span>Коррекция до 2 недель</span><span>от 1 500 ₽</span></div>
+        <div class="service-row"><span>Коррекция до 3 недель</span><span>от 1 800 ₽</span></div>
+        <div class="service-row"><span>Снятие ресниц (не у меня)</span><span>500 ₽</span></div>
+        <p class="service-note">После 3 недель рекомендую полное наращивание.</p>
+      </div>
+      <div class="service-card reveal">
+        <h3>Обучение</h3>
+        <div class="service-row"><span>Базовый курс наращивания (3 дня)</span><span>25 000 ₽</span></div>
+        <div class="service-row"><span>Курс ламинирования (1 день)</span><span>12 000 ₽</span></div>
+        <div class="service-row"><span>Индивидуальное занятие</span><span>4 000 ₽/час</span></div>
+        <p class="service-note">Сертификат и помощь в подборе стартового набора.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · MANIFESTO — open, on the silk -->
+<section class="sec sec-open manifesto">
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="container inner">
+    <blockquote>Беру не больше <b>четырёх клиенток в день</b>, чтобы уделить внимание каждой детали. Работаю на премиальных материалах и никогда не тороплюсь.</blockquote>
+    <cite>Александра Рулева · мастер</cite>
+  </div>
+</section>
+
+<!-- 4 · CURLS — solid panel (alt surface) -->
+<section class="sec sec-panel alt" id="curls">
+  <div class="container inner">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Виды изгибов</span>
+      <h2>Какой изгиб подойдёт вам</h2>
+      <p>Изгиб определяет, насколько сильно приподняты кончики ресниц.</p>
+    </div>
+    <div class="curls-row reveal">
+      <div class="curl-chip"><b>B</b><span>Естественный</span></div>
+      <div class="curl-chip"><b>C</b><span>Классический</span></div>
+      <div class="curl-chip"><b>CC</b><span>Выразительный</span></div>
+      <div class="curl-chip"><b>D</b><span>Драматичный</span></div>
+    </div>
+    <p class="curls-desc reveal">На консультации примеряем «до» и «после» и подбираем изгиб под форму глаза и ваш образ жизни.</p>
+  </div>
+</section>
+
+<!-- 5 · REVIEWS — open; cards float on the silk -->
+<section class="sec sec-open" id="reviews">
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="container inner">
+    <div class="sec-head">
+      <span class="eyebrow">Отзывы</span>
+      <h2>Что говорят клиентки</h2>
+      <p>В демо показано оформление блока — на реальном сайте здесь будут настоящие отзывы.</p>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card"><div class="stars">★★★★★</div><p>Ношу третий месяц подряд, каждый раз выхожу как из редакционной съёмки. Ничего не колется, держится идеально.</p><div class="who"><span class="av"></span><b>Марина</b><span>2D объём · изгиб C</span></div></div>
+      <div class="review-card"><div class="stars">★★★★★</div><p>Пришла с «хочу естественно, но заметно». Александра отговорила от лишней длины — и была права.</p><div class="who"><span class="av"></span><b>Ольга</b><span>Классика 1D · изгиб B</span></div></div>
+      <div class="review-card"><div class="stars">★★★★★</div><p>Ламинирование + ботокс — свои ресницы выглядят как наращённые. Напоминание в Telegram — мелочь, а приятно.</p><div class="who"><span class="av"></span><b>Дарья</b><span>Ламинирование</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · BOOKING — solid panel -->
+<section class="sec sec-panel" id="booking">
+  <div class="container inner">
+    <div class="booking reveal">
+      <div>
+        <span class="eyebrow">Запись онлайн</span>
+        <h2>Забронировать время</h2>
+        <p>Заполните заявку — свяжусь с вами в течение дня для подтверждения записи.</p>
+        <ul>
+          <li>📍 Мини-студия · адрес присылаю после подтверждения</li>
+          <li>🕙 Пн–Пт: 10:00, 13:00, 16:00 · Сб, Вс — выходные</li>
+          <li>💬 Заявка через форму или Telegram-бота</li>
+        </ul>
+      </div>
+      <div class="booking-cta">
+        <a href="#" class="btn btn-primary">Оставить заявку</a>
+        <a href="#" class="btn btn-outline">Написать в Telegram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- note -->
+<section class="sec sec-panel alt">
+  <div class="container inner">
+    <div class="proto-note reveal">
+      <b>Прототип · шёлк фоном всего сайта.</b> WebGL-шёлк закреплён за всей страницей и всегда живёт. Секции чередуются: <b>прозрачные</b> (герой, цитата, отзывы) — шёлк просвечивает, контент слегка дрейфует параллаксом; <b>плотные панели</b> (услуги, изгибы, запись) — непрозрачный фон, при скролле наезжают на шёлк и отбрасывают на него тень сверху и снизу. Три плана: шёлк не движется (дальний) → контент прозрачных секций (средний) → панели (ближний). Фолбэк — CSS-градиент, при «уменьшить движение» шёлк статичен.
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">© 2026 <b>Александра Рулева</b> · демо-проект · прототип интерфейса</div>
+</footer>
+</div>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cv = document.getElementById('silk');
+  var fb = document.querySelector('.silk-fallback');
+
+  /* ---- silk shader (fixed, full-viewport, always on) ---- */
+  var shaderOK = false;
+  if (!reduce && cv){
+    var gl = cv.getContext('webgl2', { antialias:false, alpha:false, powerPreference:'low-power' });
+    if (gl){
+      var VERT = '#version 300 es\n' +
+        'const vec2 v[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));\n' +
+        'void main(){gl_Position=vec4(v[gl_VertexID],0.,1.);}';
+      var FRAG = '#version 300 es\n' +
+        'precision highp float;\n' +
+        'out vec4 O; uniform vec2 R; uniform float T; uniform vec2 M;\n' +
+        'void main(){\n' +
+        '  vec2 uv=gl_FragCoord.xy/R.xy;\n' +
+        '  vec2 p=(uv-0.5); p.x*=R.x/R.y; p*=3.2;\n' +
+        '  p+=(M-0.5)*0.5;\n' +
+        '  vec2 q=p; float f=0.0;\n' +
+        '  for(int i=0;i<4;i++){\n' +
+        '    float fi=float(i);\n' +
+        '    q+=0.55*vec2(sin(q.y*1.7+T*0.28+fi), cos(q.x*1.6-T*0.22-fi));\n' +
+        '    f+=abs(sin(q.x*1.15)*sin(q.y*1.15));\n' +
+        '  }\n' +
+        '  f/=4.0;\n' +
+        '  float lines=pow(1.0-abs(sin(f*8.0+T*0.15)),7.0);\n' +
+        '  float haze=smoothstep(1.1,0.0,length(p*0.42));\n' +
+        '  vec3 base=vec3(0.043,0.030,0.023);\n' +
+        '  vec3 gold=vec3(0.79,0.635,0.29);\n' +
+        '  vec3 hi=vec3(1.0,0.97,0.89);\n' +
+        '  vec3 col=base;\n' +
+        '  col+=gold*(haze*0.14);\n' +
+        '  col+=gold*(lines*0.85);\n' +
+        '  col+=hi*(pow(lines,3.0)*0.4);\n' +
+        '  float vig=smoothstep(1.5,0.2,length(uv-0.5));\n' +
+        '  col*=mix(0.6,1.0,vig);\n' +
+        '  O=vec4(col,1.0);\n' +
+        '}';
+      var sh=function(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);
+        if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)){console.warn(gl.getShaderInfoLog(o));return null;}return o;};
+      var vs=sh(gl.VERTEX_SHADER,VERT), fs=sh(gl.FRAGMENT_SHADER,FRAG), prog;
+      if(vs&&fs){
+        prog=gl.createProgram();gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
+        if(gl.getProgramParameter(prog,gl.LINK_STATUS)){
+          gl.useProgram(prog);
+          var uR=gl.getUniformLocation(prog,'R'),uT=gl.getUniformLocation(prog,'T'),uM=gl.getUniformLocation(prog,'M');
+          shaderOK=true;
+          var dpr=Math.min(window.devicePixelRatio||1,1.75);
+          var resize=function(){ cv.width=Math.max(1,innerWidth*dpr|0); cv.height=Math.max(1,innerHeight*dpr|0); gl.viewport(0,0,cv.width,cv.height); };
+          addEventListener('resize',resize,{passive:true}); resize();
+          var mouse=[0.5,0.5],target=[0.5,0.5],start=performance.now(),raf=0,alive=true;
+          addEventListener('pointermove',function(e){ target[0]=e.clientX/innerWidth; target[1]=1-e.clientY/innerHeight; },{passive:true});
+          document.addEventListener('visibilitychange',function(){ alive=!document.hidden; if(alive&&!raf) raf=requestAnimationFrame(loop); });
+          var loop=function(){
+            raf=0; if(!alive) return;
+            var t=(performance.now()-start)/1000;
+            mouse[0]+=(target[0]-mouse[0])*0.035; mouse[1]+=(target[1]-mouse[1])*0.035;
+            gl.uniform2f(uR,cv.width,cv.height); gl.uniform1f(uT,t); gl.uniform2f(uM,mouse[0],mouse[1]);
+            gl.drawArrays(gl.TRIANGLES,0,3);
+            raf=requestAnimationFrame(loop);
+          };
+          raf=requestAnimationFrame(loop);
+        }
+      }
+    }
+  }
+  if(!shaderOK){ if(cv) cv.style.display='none'; if(fb) fb.hidden=false; }
+
+  /* ---- depth: parallax drift on open-section content (mid plane) ---- */
+  if(!reduce){
+    var openInners = [].slice.call(document.querySelectorAll('.sec-open > .inner'));
+    var pTick=false;
+    var parallax=function(){
+      pTick=false;
+      var vh=innerHeight;
+      for(var i=0;i<openInners.length;i++){
+        var el=openInners[i], r=el.getBoundingClientRect();
+        var c=(r.top + r.height/2 - vh/2)/vh;         // -1 (above) .. 1 (below)
+        el.style.transform='translateY('+(c*-30).toFixed(1)+'px)';
+      }
+    };
+    addEventListener('scroll',function(){ if(!pTick){ pTick=true; requestAnimationFrame(parallax); } },{passive:true});
+    addEventListener('resize',parallax,{passive:true});
+    parallax();
+  }
+
+  /* ---- reveal on enter (panel content) ---- */
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){ [].forEach.call(els,function(e){ e.classList.add('is-visible'); }); }
+  else{
+    var io=new IntersectionObserver(function(en){
+      en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('is-visible'); io.unobserve(x.target); } });
+    },{threshold:0.12});
+    [].forEach.call(els,function(e){ io.observe(e); });
+  }
+})();
+</script>
+</body>
+</html>
