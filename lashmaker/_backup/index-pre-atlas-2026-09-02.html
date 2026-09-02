@@ -72,8 +72,8 @@
 <script src="assets/track.js?v=3"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link id="gfonts" rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,800&family=Cormorant:wght@600&family=Cormorant+Garamond:ital,wght@0,500;1,300;1,500&family=Manrope:wght@300;400;600;700;800&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,800&family=Cormorant:wght@600&family=Cormorant+Garamond:ital,wght@0,500;1,300;1,500&family=Manrope:wght@300;400;600;700;800&display=swap"></noscript>
+<link id="gfonts" rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,800&family=Cormorant+Garamond:ital,wght@0,500;1,300;1,500&family=Manrope:wght@300;400;600;700;800&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,800&family=Cormorant+Garamond:ital,wght@0,500;1,300;1,500&family=Manrope:wght@300;400;600;700;800&display=swap"></noscript>
 <style>
   :root{
     --bg:#0c0806;
@@ -590,152 +590,9 @@
   a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
   [tabindex]:focus-visible,summary:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px;border-radius:2px;}
 </style>
-<style id="atlas-style">
-  /* ============ Атлас-фон на всю страницу + чередование open / panel ============ */
-  #atlasBg{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none;}
-  .atlas-fallback{
-    position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:
-      radial-gradient(80% 60% at 34% 36%, rgba(201,162,74,.18), transparent 60%),
-      repeating-linear-gradient(118deg, rgba(0,0,0,.5) 0 40px, rgba(30,20,10,.12) 40px 82px, rgba(0,0,0,.46) 82px 122px),
-      linear-gradient(155deg,#0c0806,#180f09 48%,#0c0806 100%);
-  }
-  :root[data-theme="light"] #atlasBg,
-  :root[data-theme="light"] .atlas-fallback{display:none;}   /* светлая тема — работает штатный .page-backdrop */
-
-  header.site-header{z-index:200;}
-  main#main{position:relative;z-index:1;}
-  footer{position:relative;z-index:2;box-shadow:0 -26px 55px -12px rgba(0,0,0,.55);}
-
-  /* герой: убираем собственную ткань, чтобы был виден атлас */
-  #top .hero-fabric{display:none !important;}
-  #top{background:transparent;}
-  #top::before{
-    content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-    background:linear-gradient(100deg, rgba(10,7,5,.82) 0%, rgba(10,7,5,.42) 44%, transparent 72%);
-  }
-  :root[data-theme="light"] #top::before{background:linear-gradient(100deg, rgba(255,251,242,.85) 0%, rgba(255,251,242,.4) 46%, transparent 74%);}
-  #top .hero-inner{position:relative;z-index:1;}
-
-  /* ---- OPEN: прозрачные секции, атлас просвечивает, контент дрейфует ---- */
-  .atlas-open, .atlas-open.section-alt{background:transparent !important;}
-  .atlas-open{isolation:isolate;}
-  .atlas-open > .damask{z-index:0;}
-  .atlas-open::before{
-    content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:radial-gradient(66% 62% at 50% 48%, rgba(10,7,5,.6), rgba(10,7,5,.16) 64%, transparent 90%);
-  }
-  :root[data-theme="light"] .atlas-open::before{background:radial-gradient(66% 62% at 50% 48%, rgba(255,251,242,.72), rgba(255,251,242,.2) 64%, transparent 90%);}
-  .atlas-open > .container{position:relative;z-index:2;will-change:transform;}
-  .atlas-open .section-head :is(h2,p,.eyebrow),
-  .atlas-open > .container > :is(h2,.eyebrow){text-shadow:0 2px 18px rgba(10,7,5,.8),0 1px 3px rgba(0,0,0,.55);}
-  :root[data-theme="light"] .atlas-open .section-head :is(h2,p,.eyebrow){text-shadow:0 1px 10px rgba(255,251,242,.9);}
-
-  /* ---- PANEL: плотные секции наезжают на атлас и отбрасывают тень ---- */
-  .atlas-panel{
-    position:relative;z-index:2;background:var(--bg) !important;
-    box-shadow:0 -26px 55px -10px rgba(0,0,0,.6), 0 26px 55px -10px rgba(0,0,0,.5);
-    border-top:1px solid rgba(232,200,118,.12);
-    border-bottom:1px solid rgba(0,0,0,.5);
-  }
-  :root[data-theme="light"] .atlas-panel{
-    background:var(--surface) !important;
-    box-shadow:0 -22px 46px -12px rgba(90,64,20,.16), 0 22px 46px -12px rgba(90,64,20,.14);
-    border-top:1px solid rgba(184,134,58,.14);
-    border-bottom:1px solid rgba(122,90,36,.10);
-  }
-  .marquee{position:relative;z-index:2;background:var(--bg) !important;}
-
-  /* ---- портфолио → орбита ---- */
-  .atlas-orbit{
-    position:relative;display:block !important;grid-template-columns:none !important;
-    height:min(84svh,760px);margin:0;overflow:visible;
-  }
-  .atlas-orbit .photo-card{
-    position:absolute;left:0;top:0;width:clamp(188px,20vw,266px);margin:0;opacity:0;
-    transform-origin:center center;will-change:transform,filter,opacity;
-    transition:filter .35s ease, opacity .35s ease, box-shadow .35s ease, border-color .35s ease;
-  }
-  .atlas-orbit .photo-card.is-hot{
-    transition:transform .4s cubic-bezier(.16,1,.3,1), filter .35s ease, opacity .35s ease, box-shadow .35s ease, border-color .35s ease;
-    box-shadow:var(--shadow-lg), var(--glow);border-color:var(--accent);
-  }
-  .atlas-orbit .photo-card:hover{transform:none;}          /* JS drives the transform; kill the base hover lift */
-  .atlas-orbit .photo-thumb{aspect-ratio:4/5;}
-  #portfolio .filters{display:none;}
-  #portfolio .section-head{position:relative;z-index:3;}
-
-  @media (prefers-reduced-motion:reduce){
-    #atlasBg{display:none;}
-    .atlas-open > .container{transform:none !important;}
-    .atlas-orbit{height:auto !important;display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:22px;}
-    .atlas-orbit .photo-card{position:static !important;width:auto !important;transform:none !important;filter:none !important;opacity:1 !important;}
-    #portfolio .filters{display:flex;}
-  }
-  @media(max-width:980px){ .atlas-orbit{height:min(72svh,640px);} }
-  @media(max-width:720px){
-    .atlas-orbit{height:auto !important;display:grid !important;grid-template-columns:1fr !important;gap:20px;}
-    .atlas-orbit .photo-card{position:static !important;width:auto !important;transform:none !important;filter:none !important;opacity:1 !important;}
-    #portfolio .filters{display:flex;}
-    .atlas-open::before{display:none;}
-  }
-
-  /* ===== услуги: живая анимация появления и наведения ===== */
-  #services .service-card.reveal{
-    opacity:0;transform:translateY(64px) scale(.93);filter:blur(7px);
-    transition:opacity .8s ease, transform .95s cubic-bezier(.16,1,.3,1), filter .8s ease;
-  }
-  #services .service-card.reveal.is-visible{opacity:1;transform:none;filter:blur(0);}
-  #services .service-card{
-    position:relative;overflow:hidden;
-    transition:transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s ease, border-color .45s ease;
-  }
-  #services .service-card::after{
-    content:'';position:absolute;top:0;left:-75%;width:48%;height:100%;pointer-events:none;
-    background:linear-gradient(115deg, transparent, rgba(255,248,228,.12), transparent);
-    transform:skewX(-18deg);transition:left .85s cubic-bezier(.22,1,.36,1);
-  }
-  #services .service-card:hover{
-    box-shadow:var(--shadow-lg), 0 0 64px -16px rgba(201,162,74,.45);
-    border-color:var(--accent);
-  }
-  #services .service-card:hover::after{left:135%;}
-  #services .service-card h3{transition:color .3s ease, letter-spacing .3s ease;}
-  #services .service-card:hover h3{color:var(--accent-strong);letter-spacing:.01em;}
-  #services .service-card .orn-corner{transition:opacity .45s ease, transform .5s cubic-bezier(.16,1,.3,1);}
-  #services .service-card:hover .orn-tl{opacity:1;transform:scale(1.18);}
-  #services .service-card:hover .orn-br{opacity:1;transform:scale(1.18) rotate(180deg);}
-  #services .service-row span:last-child{transition:transform .3s cubic-bezier(.16,1,.3,1), color .3s ease;}
-  #services .service-card:hover .service-row span:last-child{transform:translateX(-4px);color:var(--accent-strong);}
-  @media (prefers-reduced-motion:reduce){
-    #services .service-card.reveal{opacity:1;transform:none;filter:none;transition:none;}
-    #services .service-card::after{display:none;}
-  }
-
-  /* имя в герое — Cormorant 600, прямое (выбор пользователя вместо Cormorant Garamond Italic) */
-  .hero h1{
-    font-family:'Cormorant', 'Cormorant Garamond', serif;
-    font-weight:600;
-    font-style:normal;
-    letter-spacing:.006em;
-    line-height:1.06;
-  }
-
-  /* тест «дышит» на атласе — карточка приподнята над фоном с тёплым свечением */
-  #quiz.atlas-open .quiz-wrap{
-    box-shadow:var(--shadow-lg), 0 0 90px -22px rgba(201,162,74,.28);
-    border-color:var(--accent-2);
-    border-top:1px solid rgba(232,200,118,.22);
-  }
-  :root[data-theme="light"] #quiz.atlas-open .quiz-wrap{
-    box-shadow:var(--shadow-lg), 0 0 70px -24px rgba(184,134,58,.3);
-  }
-</style>
 </head>
 <body>
 <a class="skip-link" href="#main">К основному содержимому</a>
-<canvas id="atlasBg" aria-hidden="true"></canvas>
-<div class="atlas-fallback" aria-hidden="true" hidden></div>
 <div class="page-backdrop" aria-hidden="true"></div>
 <div class="curtain" aria-hidden="true">
   <div class="curtain-panel curtain-left"></div>
@@ -889,8 +746,8 @@
   <div class="container">
     <div class="section-head reveal">
       <span class="eyebrow">Виды изгибов</span>
-      <h2>Какие бывают изгибы</h2>
-      <p>Изгиб определяет, насколько сильно приподняты кончики ресниц. Ниже — основные варианты с эффектом «до и после».</p>
+      <h2>Какой изгиб подойдёт именно вам</h2>
+      <p>Изгиб определяет, насколько сильно приподняты кончики ресниц. Выберите вариант и посмотрите «до» и «после».</p>
     </div>
     <div class="curl-tabs reveal">
       <button class="curl-tab" data-curl="b">B</button>
@@ -988,7 +845,7 @@
   <div class="container">
     <div class="section-head reveal">
       <span class="eyebrow">Отзывы</span>
-      <h2>Отзывы клиентов о моей работе</h2>
+      <h2>Блок отзывов</h2>
       <p>В демо показано оформление блока. На реальном сайте здесь будут настоящие отзывы клиентов мастера.</p>
     </div>
     <div class="reviews-grid" id="reviewsGrid"></div>
@@ -1053,10 +910,8 @@
 </section>
 <section class="section" id="contacts">
   <div class="container">
-    <div class="section-head reveal">
-      <span class="eyebrow">Контакты</span>
-      <h2>Буду рада видеть вас у себя</h2>
-    </div>
+    <span class="eyebrow reveal" style="display:flex;justify-content:center;">Контакты</span>
+    <h2 class="reveal" style="text-align:center;margin-bottom:48px;">Буду рада видеть вас у себя</h2>
     <div class="contacts-grid reveal" style="grid-template-columns:1fr;">
       <div class="contacts-info">
         <div class="contact-item"><div class="contact-icon">📍</div><div><h4>Адрес и карта</h4><p>Это демо, поэтому реального адреса и карты здесь нет. На сайте настоящего мастера в этом блоке будет адрес студии и карта с меткой.</p></div></div>
@@ -1090,6 +945,5 @@
   </div>
 </footer>
 <script src="assets/site.js?v=3" defer></script>
-<script src="assets/atlas-bg.js?v=1" defer></script>
 </body>
 </html>
