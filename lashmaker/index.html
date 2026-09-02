@@ -139,6 +139,7 @@
     background-size:100px 100px;
   }
   img,svg{display:block;max-width:100%;}
+  [hidden]{display:none !important;}
   a{color:inherit;}
   h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;margin:0 0 .5em;color:var(--ink);}
   p{margin:0 0 1em;}
@@ -219,6 +220,9 @@
   }
   .btn-outline:hover::after{left:135%;}
   .btn-block{width:100%;}
+  .btn:disabled,.btn.is-incomplete{opacity:.5;cursor:not-allowed;box-shadow:none;filter:saturate(.55);}
+  .btn:disabled:hover,.btn.is-incomplete:hover{transform:none;box-shadow:none;}
+  .btn:disabled::after,.btn.is-incomplete::after{display:none;}
   .curtain{position:fixed;inset:0;z-index:10000;display:flex;pointer-events:none;}
   .curtain-panel{
     flex:1;position:relative;
@@ -1043,11 +1047,11 @@
             <option>Обучение / консультация</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary btn-block" id="bookingSubmitBtn" disabled>Отправить заявку</button>
+        <button type="submit" class="btn btn-primary btn-block" id="bookingSubmitBtn">Отправить заявку</button>
         <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
         <a href="#" class="btn btn-outline btn-block booking-confirm-link" id="bookingConfirmLink" target="_blank" rel="noopener" hidden>Подтвердить в Telegram и получить напоминание за 2 часа</a>
       </form>
-      <script src="assets/booking.js?v=5"></script>
+      <script src="assets/booking.js?v=6"></script>
     </div>
   </div>
 </section>

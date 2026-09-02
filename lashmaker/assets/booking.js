@@ -53,7 +53,11 @@
   var confirmLinkEl = document.getElementById('bookingConfirmLink');
 
   function setSubmitEnabled(){
-    submitBtn.disabled = !(state.selectedDate && state.selectedTime);
+    // keep the button clickable so a click always runs validation and shows a
+    // helpful message ("Выберите дату и время записи."); just dim it visually
+    // while the date/time are missing.
+    submitBtn.classList.toggle('is-incomplete', !(state.selectedDate && state.selectedTime));
+    submitBtn.disabled = false;
   }
 
   function fetchAvailability(from, to){
@@ -175,6 +179,8 @@
       state.selectedDate = null;
       state.selectedTime = null;
       state.availability = {};
+      submitBtn.disabled = false;
+      setSubmitEnabled();
       loadPage();
     }).catch(function(err){
       if(err.message === 'slot_taken'){
@@ -188,5 +194,6 @@
     });
   });
 
+  setSubmitEnabled();
   loadPage();
 })();
