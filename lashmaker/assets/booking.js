@@ -85,8 +85,16 @@
 
   function renderTimes(){
     timesEl.innerHTML = '';
+    timesEl.classList.remove('needs-time');
     if(!state.selectedDate){ return; }
     var slots = state.availability[state.selectedDate] || [];
+    if(slots.length){
+      var lbl = document.createElement('div');
+      lbl.className = 'booking-times-label';
+      lbl.textContent = 'Время';
+      timesEl.appendChild(lbl);
+    }
+    var hasFree = false;
     slots.forEach(function(s){
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -94,10 +102,14 @@
       btn.textContent = s.free ? s.time : (s.time + ' — занято');
       btn.disabled = !s.free;
       if(s.free){
+        hasFree = true;
         btn.addEventListener('click', function(){ selectTime(s.time); });
       }
       timesEl.appendChild(btn);
     });
+    if(hasFree && !state.selectedTime){
+      timesEl.classList.add('needs-time');
+    }
   }
 
   function selectDate(date){
