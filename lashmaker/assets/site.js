@@ -79,10 +79,14 @@ if(heroPortraitFrame){
   });
 }
 const PORTFOLIO = [
-  {cat:'classic',    title:'Классика',      sub:'натуральный эффект',        img:'work-classic.jpg',    w:1100, h:797},
-  {cat:'volume2d',   title:'2D объём',      sub:'лёгкая пушистость',         img:'work-2d.jpg',         w:1100, h:733},
-  {cat:'volume3d',   title:'3D объём',      sub:'выразительный, эффект макияжа', img:'work-3d.jpg',      w:1100, h:825},
-  {cat:'lamination', title:'Ламинирование', sub:'подъём и блеск своих ресниц', img:'work-lamination.jpg', w:1100, h:953},
+  {cat:'classic',     title:'Классика',      sub:'натуральный эффект',            img:'work-classic.jpg',  w:1100, h:797},
+  // 2D: no clean (unwatermarked) photo yet — falls back to the icon placeholder below
+  // rather than keep showing the old Unsplash+ stock shot with its watermark tiled over it.
+  {cat:'volume2d',    title:'2D объём',      sub:'лёгкая пушистость',             img:null,                 w:1100, h:733},
+  {cat:'volume3d',    title:'3D объём',      sub:'выразительный, эффект макияжа', img:'work-3d.jpg',       w:1100, h:797},
+  {cat:'volume5d',    title:'5D объём',      sub:'максимальный объём',            img:'work-5d.jpg',       w:1100, h:796},
+  {cat:'hypervolume', title:'Гипер-объём',   sub:'предельная пышность',           img:'work-hyper.jpg',    w:1100, h:794},
+  {cat:'lamination',  title:'Ламинирование', sub:'подъём и блеск своих ресниц',   img:'work-lamination.jpg', w:1100, h:797},
 ];
 const grid = document.getElementById('portfolioGrid');
 PORTFOLIO.forEach(item=>{

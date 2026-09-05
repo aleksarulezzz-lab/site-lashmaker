@@ -143,7 +143,8 @@
   a{color:inherit;}
   h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;margin:0 0 .5em;color:var(--ink);}
   p{margin:0 0 1em;}
-  .container{max-width:1180px;margin:0 auto;padding:0 24px;position:relative;}
+  .container{max-width:1440px;margin:0 auto;padding:0 clamp(24px,4.5vw,72px);position:relative;}
+  @media(min-width:1600px){ .container{max-width:1520px;} }
   .section{padding:120px 0;position:relative;overflow:hidden;}
   /* one continuous backdrop pinned behind the whole page — sections scroll over it like a window,
      instead of each section carrying its own separate (and choppier-looking) background */
@@ -181,9 +182,6 @@
   .section-head{max-width:640px;margin:0 auto 68px;text-align:center;}
   .section-head h2{font-size:clamp(32px,4.2vw,48px);}
   .section-head p{color:var(--ink-soft);font-size:19px;font-family:var(--font-script);}
-  .orn-corner{position:absolute;width:34px;height:34px;color:var(--accent);opacity:.85;pointer-events:none;}
-  .orn-tl{top:8px;left:8px;}
-  .orn-br{bottom:8px;right:8px;transform:rotate(180deg);}
   .frame{position:relative;}
   /* No CSS `filter` anywhere on this heading — Safari has known bugs where `filter` (e.g.
      drop-shadow) on an element that is (a) inside an overflow:hidden ancestor (.hero) and/or
@@ -246,7 +244,7 @@
   @keyframes curtainOpenLeft{ to{ transform:translateX(-101%); } }
   @keyframes curtainOpenRight{ to{ transform:translateX(101%); } }
   header.site-header{
-    position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:1040px;
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:1280px;
     background:var(--header-bg);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
     border:1px solid var(--header-border);border-radius:100px;box-shadow:0 20px 50px -20px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06);
   }
@@ -299,7 +297,7 @@
   }
   @keyframes fabricDrift{0%,100%{background-position:0% 0%, 0% 0%, 0 0;}50%{background-position:30% 20%, -20% 15%, 0 0;}}
   @keyframes fabricSheen{0%,100%{background-position:0% 0%;}50%{background-position:100% 60%;}}
-  .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.05fr;gap:48px;align-items:center;max-width:1180px;margin:0 auto;padding:170px 24px 120px;}
+  .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(48px,6vw,96px);align-items:center;max-width:1440px;margin:0 auto;padding:170px clamp(24px,4.5vw,72px) 120px;}
   .hero-text{padding:10px 0 0 8px;margin:-10px 0 0 -8px;}
   /* Alexandra's portrait — freely floating cutout, no hard frame */
   .hero-portrait-frame{
@@ -497,11 +495,16 @@
   .booking-days{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
   .booking-day-btn{padding:10px 14px;border:1px solid var(--border);background:transparent;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:.2s;white-space:nowrap;}
   .booking-day-btn:hover{border-color:var(--accent);}
-  .booking-day-btn.is-selected{border-color:var(--accent);background:rgba(201,162,74,.12);color:var(--accent);}
-  .booking-times{display:flex;flex-wrap:wrap;gap:8px;}
-  .booking-time-btn{padding:10px 18px;border:1px solid var(--border);background:transparent;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:.2s;}
-  .booking-time-btn:hover:not(:disabled){border-color:var(--accent);}
-  .booking-time-btn.is-selected{border-color:var(--accent);background:rgba(201,162,74,.12);color:var(--accent);}
+  .booking-day-btn.is-selected{border-color:var(--accent);background:var(--accent);color:#1a1006;font-weight:700;}
+  .booking-times-label{width:100%;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:2px;}
+  .booking-times{display:flex;flex-wrap:wrap;gap:8px;align-items:center;transition:box-shadow .25s ease;}
+  .booking-times.needs-time{box-shadow:0 0 0 1px var(--accent-2);border-radius:8px;padding:12px;margin:2px -12px 0;}
+  .booking-time-btn{padding:12px 20px;border:1px solid var(--border);background:transparent;font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer;transition:.2s;}
+  .booking-time-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(201,162,74,.08);}
+  .booking-times.needs-time .booking-time-btn:not(.is-booked){border-color:var(--accent);animation:timePulse 1.5s ease-in-out infinite;}
+  @keyframes timePulse{0%,100%{box-shadow:0 0 0 0 rgba(201,162,74,.45);}55%{box-shadow:0 0 0 5px rgba(201,162,74,0);}}
+  @media (prefers-reduced-motion:reduce){.booking-times.needs-time .booking-time-btn{animation:none;}}
+  .booking-time-btn.is-selected{border-color:var(--accent);background:var(--accent);color:#1a1006;}
   .booking-time-btn.is-booked{opacity:.4;text-decoration:line-through;cursor:not-allowed;}
   .booking-error{color:#c17a6a;font-size:13.5px;margin:0;}
   .booking-confirm-link{margin-top:14px;text-align:center;}
@@ -604,8 +607,13 @@
       repeating-linear-gradient(118deg, rgba(0,0,0,.5) 0 40px, rgba(30,20,10,.12) 40px 82px, rgba(0,0,0,.46) 82px 122px),
       linear-gradient(155deg,#0c0806,#180f09 48%,#0c0806 100%);
   }
-  :root[data-theme="light"] #atlasBg,
-  :root[data-theme="light"] .atlas-fallback{display:none;}   /* светлая тема — работает штатный .page-backdrop */
+  /* светлая тема: тот же шёлковый шейдер, только кремовая палитра (uniform L в atlas-bg.js) */
+  :root[data-theme="light"] .atlas-fallback{
+    background:
+      radial-gradient(80% 60% at 34% 36%, rgba(201,162,74,.14), transparent 60%),
+      repeating-linear-gradient(118deg, rgba(122,90,36,.08) 0 40px, rgba(255,251,242,0) 40px 82px, rgba(122,90,36,.05) 82px 122px),
+      linear-gradient(155deg,#fbf6ea,#f1e2c4 48%,#fbf6ea 100%);
+  }
 
   header.site-header{z-index:200;}
   main#main{position:relative;z-index:1;}
@@ -653,12 +661,13 @@
   /* ---- портфолио → орбита ---- */
   .atlas-orbit{
     position:relative;display:block !important;grid-template-columns:none !important;
-    height:min(84svh,760px);margin:0;overflow:visible;
+    height:min(60svh,540px);margin:0;overflow:visible;
   }
   .atlas-orbit .photo-card{
-    position:absolute;left:0;top:0;width:clamp(188px,20vw,266px);margin:0;opacity:0;
-    transform-origin:center center;will-change:transform,filter,opacity;
-    transition:filter .35s ease, opacity .35s ease, box-shadow .35s ease, border-color .35s ease;
+    position:absolute;left:0;top:0;width:clamp(150px,15vw,208px);margin:0;opacity:0;
+    transform-origin:center center;will-change:transform,opacity;backface-visibility:hidden;
+    contain:layout paint style;
+    transition:opacity .35s ease, box-shadow .35s ease, border-color .35s ease;
   }
   .atlas-orbit .photo-card.is-hot{
     transition:transform .4s cubic-bezier(.16,1,.3,1), filter .35s ease, opacity .35s ease, box-shadow .35s ease, border-color .35s ease;
@@ -676,10 +685,23 @@
     .atlas-orbit .photo-card{position:static !important;width:auto !important;transform:none !important;filter:none !important;opacity:1 !important;}
     #portfolio .filters{display:flex;}
   }
-  @media(max-width:980px){ .atlas-orbit{height:min(72svh,640px);} }
+  @media(max-width:980px){ .atlas-orbit{height:min(56svh,460px);} }
+  /* mobile: same bright-centre / dim-periphery language as the desktop orbit, but driven by
+     a touch swipe on native scroll-snap instead of an autonomous spin — see atlas-bg.js
+     initMobileCarousel(). No autoplay: on a phone the finger already sets the pace. */
   @media(max-width:720px){
-    .atlas-orbit{height:auto !important;display:grid !important;grid-template-columns:1fr !important;gap:20px;}
-    .atlas-orbit .photo-card{position:static !important;width:auto !important;transform:none !important;filter:none !important;opacity:1 !important;}
+    .atlas-orbit{
+      height:auto !important;display:flex !important;grid-template-columns:none !important;
+      gap:14px;align-items:center;overflow-x:auto;overflow-y:visible;
+      scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+      scrollbar-width:none;-ms-overflow-style:none;
+      padding:16px 19vw 24px;margin:0 -24px;
+    }
+    .atlas-orbit::-webkit-scrollbar{display:none;}
+    .atlas-orbit .photo-card{
+      position:static !important;flex:0 0 auto;width:62vw !important;max-width:260px;
+      scroll-snap-align:center;scroll-snap-stop:always;opacity:1;
+    }
     #portfolio .filters{display:flex;}
     .atlas-open::before{display:none;}
   }
@@ -706,9 +728,6 @@
   #services .service-card:hover::after{left:135%;}
   #services .service-card h3{transition:color .3s ease, letter-spacing .3s ease;}
   #services .service-card:hover h3{color:var(--accent-strong);letter-spacing:.01em;}
-  #services .service-card .orn-corner{transition:opacity .45s ease, transform .5s cubic-bezier(.16,1,.3,1);}
-  #services .service-card:hover .orn-tl{opacity:1;transform:scale(1.18);}
-  #services .service-card:hover .orn-br{opacity:1;transform:scale(1.18) rotate(180deg);}
   #services .service-row span:last-child{transition:transform .3s cubic-bezier(.16,1,.3,1), color .3s ease;}
   #services .service-card:hover .service-row span:last-child{transform:translateX(-4px);color:var(--accent-strong);}
   @media (prefers-reduced-motion:reduce){
@@ -747,10 +766,6 @@
 </div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <symbol id="flourish-corner" viewBox="0 0 120 120">
-      <path d="M10,10 C10,55 10,92 46,104 C70,112 90,98 82,80 C76,66 58,64 54,76 C51,85 62,90 69,82" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
-      <path d="M28,42 C20,32 22,17 35,10 C33,25 38,35 49,37 C40,43 33,44 28,42 Z" fill="currentColor"/>
-    </symbol>
     <symbol id="flourish-line" viewBox="0 0 48 20">
       <path d="M2,10 C9,10 9,4 16,4 C23,4 23,16 30,16 C37,16 37,10 46,10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       <circle cx="24" cy="10" r="2.2" fill="currentColor"/>
@@ -831,8 +846,6 @@
     </div>
     <div class="services-grid">
       <div class="service-card frame reveal">
-        <svg class="orn-corner orn-tl"><use href="#flourish-corner"></use></svg>
-        <svg class="orn-corner orn-br"><use href="#flourish-corner"></use></svg>
         <h3>Наращивание ресниц</h3>
         <div class="service-row"><span>Классическое (1D)</span><span>от 2 200 ₽</span></div>
         <div class="service-row"><span>Голливудское 2D</span><span>от 2 600 ₽</span></div>
@@ -842,8 +855,6 @@
         <p class="service-note">В стоимость входит консультация по изгибу и длине.</p>
       </div>
       <div class="service-card frame reveal">
-        <svg class="orn-corner orn-tl"><use href="#flourish-corner"></use></svg>
-        <svg class="orn-corner orn-br"><use href="#flourish-corner"></use></svg>
         <h3>Ламинирование</h3>
         <div class="service-row"><span>Ламинирование + ботокс + окрашивание</span><span>от 2 800 ₽</span></div>
         <div class="service-row"><span>Ламинирование ресниц и бровей</span><span>от 3 900 ₽</span></div>
@@ -851,8 +862,6 @@
         <p class="service-note">Эффект держится 4–6 недель.</p>
       </div>
       <div class="service-card frame reveal">
-        <svg class="orn-corner orn-tl"><use href="#flourish-corner"></use></svg>
-        <svg class="orn-corner orn-br"><use href="#flourish-corner"></use></svg>
         <h3>Коррекция и снятие</h3>
         <div class="service-row"><span>Коррекция до 2 недель</span><span>от 1 500 ₽</span></div>
         <div class="service-row"><span>Коррекция до 3 недель</span><span>от 1 800 ₽</span></div>
@@ -860,8 +869,6 @@
         <p class="service-note">После 3 недель рекомендую полное наращивание.</p>
       </div>
       <div class="service-card frame reveal">
-        <svg class="orn-corner orn-tl"><use href="#flourish-corner"></use></svg>
-        <svg class="orn-corner orn-br"><use href="#flourish-corner"></use></svg>
         <h3>Обучение</h3>
         <div class="service-row"><span>Базовый курс наращивания (3 дня)</span><span>25 000 ₽</span></div>
         <div class="service-row"><span>Курс ламинирования (1 день)</span><span>12 000 ₽</span></div>
@@ -882,7 +889,9 @@
       <button class="filter-btn is-active" data-filter="all">Все работы</button>
       <button class="filter-btn" data-filter="classic">Классика</button>
       <button class="filter-btn" data-filter="volume2d">2D</button>
-      <button class="filter-btn" data-filter="volume3d">3D–5D</button>
+      <button class="filter-btn" data-filter="volume3d">3D</button>
+      <button class="filter-btn" data-filter="volume5d">5D</button>
+      <button class="filter-btn" data-filter="hypervolume">Гипер-объём</button>
       <button class="filter-btn" data-filter="lamination">Ламинирование</button>
     </div>
     <div class="portfolio-grid" id="portfolioGrid"></div>
@@ -1093,7 +1102,7 @@
     © 2026 <b>Александра Рулева</b>
   </div>
 </footer>
-<script src="assets/site.js?v=3" defer></script>
-<script src="assets/atlas-bg.js?v=1" defer></script>
+<script src="assets/site.js?v=5" defer></script>
+<script src="assets/atlas-bg.js?v=4" defer></script>
 </body>
 </html>
