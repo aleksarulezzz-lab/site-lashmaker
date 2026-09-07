@@ -1,10 +1,22 @@
 User-agent: *
 Allow: /
 
-# Черновики и служебные страницы прототипа — не индексировать
+# Черновики и служебные страницы прототипа — не сканировать и не индексировать
 Disallow: /lashmaker/variant-
 Disallow: /lashmaker/preview.html
 Disallow: /lashmaker/design-history.html
 Disallow: /lashmaker/index-video-hero.html
+Disallow: /lashmaker/hero-font-options.html
+Disallow: /lashmaker/proto-
+Disallow: /lashmaker/_backup/
+
+# index-atlas.html НЕ блокируем в robots.txt: у неё есть <meta robots noindex>,
+# и если Google её уже видел (миграция на atlas в начале сентября) — пусть
+# пересканирует, увидит noindex и сам выкинет из индекса. Блокировка это заморозила бы.
+
+# Исключение: бывший адрес живой страницы оставляем открытым для сканирования,
+# чтобы Google увидел 301-редирект на /lashmaker/ и склеил сигналы
+# (правило Allow длиннее — у Google/Bing/Yandex побеждает более точный путь).
+Allow: /lashmaker/variant-12-baroque-silk-drape.html
 
 Sitemap: https://aleksarulezzz.ru/sitemap.xml

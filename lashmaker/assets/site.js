@@ -80,9 +80,7 @@ if(heroPortraitFrame){
 }
 const PORTFOLIO = [
   {cat:'classic',     title:'Классика',      sub:'натуральный эффект',            img:'work-classic.jpg',  w:1100, h:797},
-  // 2D: no clean (unwatermarked) photo yet — falls back to the icon placeholder below
-  // rather than keep showing the old Unsplash+ stock shot with its watermark tiled over it.
-  {cat:'volume2d',    title:'2D объём',      sub:'лёгкая пушистость',             img:null,                 w:1100, h:733},
+  {cat:'volume2d',    title:'2D объём',      sub:'лёгкая пушистость',             img:'work-2d.jpg',       w:1100, h:798},
   {cat:'volume3d',    title:'3D объём',      sub:'выразительный, эффект макияжа', img:'work-3d.jpg',       w:1100, h:797},
   {cat:'volume5d',    title:'5D объём',      sub:'максимальный объём',            img:'work-5d.jpg',       w:1100, h:796},
   {cat:'hypervolume', title:'Гипер-объём',   sub:'предельная пышность',           img:'work-hyper.jpg',    w:1100, h:794},
@@ -238,7 +236,7 @@ document.querySelectorAll('.reveal-group').forEach(group=>{
   Array.from(group.children).forEach((el,i)=>{ el.classList.add('reveal'); el.style.transitionDelay = (i*0.08)+'s'; });
 });
 [document.querySelector('.services-grid'), document.getElementById('portfolioGrid'), document.getElementById('curlCards'), document.getElementById('careGrid'), document.getElementById('reviewsGrid')].forEach(group=>{
-  Array.from(group.children).forEach((el,i)=>{ el.style.transitionDelay = (i%4*0.08)+'s'; });
+  Array.from(group.children).forEach((el,i)=>{ el.style.transitionDelay = (Math.min(i,5)*0.07)+'s'; });
 });
 const io = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target);} });

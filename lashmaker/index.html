@@ -735,6 +735,39 @@
     #services .service-card::after{display:none;}
   }
 
+  /* ===== виды наращивания / советы по уходу / отзывы: та же оркестрованная анимация появления карточек ===== */
+  /* transition живёт на всегда-совпадающем селекторе; скрытое состояние — через :not(.is-visible),
+     чтобы в открытом состоянии не перебивать hover-трансформ карточек */
+  #curls .curl-card.reveal{
+    transition:opacity .8s ease, transform .95s cubic-bezier(.16,1,.3,1), filter .8s ease,
+               border-color .35s ease, box-shadow .35s ease;
+  }
+  #curls .curl-card.reveal:not(.is-visible){
+    opacity:0;transform:translateY(60px) scale(.93);filter:blur(7px);
+  }
+  #care .care-card.reveal,
+  #reviews .review-card.reveal{
+    transition:opacity .8s ease, transform .95s cubic-bezier(.16,1,.3,1), filter .8s ease,
+               border-color .35s ease, box-shadow .35s ease;
+  }
+  #care .care-card.reveal:not(.is-visible),
+  #reviews .review-card.reveal:not(.is-visible){
+    opacity:0;transform:translateY(60px) scale(.93);filter:blur(7px);
+  }
+  /* после появления возвращаем короткий hover-подъём карточкам с реальным CSS-hover */
+  #care .care-card.reveal.is-visible:hover,
+  #reviews .review-card.reveal.is-visible:hover{
+    transition:transform .4s cubic-bezier(.16,1,.3,1), box-shadow .35s ease, border-color .35s ease;
+  }
+  @media (prefers-reduced-motion:reduce){
+    #curls .curl-card.reveal:not(.is-visible),
+    #care .care-card.reveal:not(.is-visible),
+    #reviews .review-card.reveal:not(.is-visible){opacity:1;transform:none;filter:none;}
+    #curls .curl-card.reveal,
+    #care .care-card.reveal,
+    #reviews .review-card.reveal{transition:none;}
+  }
+
   /* имя в герое — Cormorant 600, прямое (выбор пользователя вместо Cormorant Garamond Italic) */
   .hero h1{
     font-family:'Cormorant', 'Cormorant Garamond', serif;
@@ -1102,7 +1135,7 @@
     © 2026 <b>Александра Рулева</b>
   </div>
 </footer>
-<script src="assets/site.js?v=5" defer></script>
+<script src="assets/site.js?v=6" defer></script>
 <script src="assets/atlas-bg.js?v=4" defer></script>
 </body>
 </html>

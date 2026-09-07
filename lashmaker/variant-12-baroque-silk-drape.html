@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Александра Рулева — демо-проект</title>
 <link rel="canonical" href="https://aleksarulezzz.ru/lashmaker/">
-<meta name="robots" content="noindex, follow">
-<meta http-equiv="refresh" content="0; url=/lashmaker/">
-<script>location.replace('/lashmaker/');</script>
+<!-- Это редирект-заглушка бывшего адреса живой страницы. НЕ ставить noindex:
+     Google должен просканировать её, увидеть редирект и склеить сигналы с /lashmaker/.
+     noindex + редирект = конфликт, из-за него GSC ругался «запрещено тегом noindex». -->
+<meta http-equiv="refresh" content="0; url=https://aleksarulezzz.ru/lashmaker/">
+<script>location.replace('https://aleksarulezzz.ru/lashmaker/');</script>
 </head>
 <body>Страница переехала на <a href="/lashmaker/">aleksarulezzz.ru/lashmaker/</a></body>
 </html>
